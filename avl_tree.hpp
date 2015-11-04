@@ -127,7 +127,7 @@ public:
 
     iterator erase(const_iterator);
     void clear();
-    template<
+    template<class iter>
     void assign(iter, iter);
     void assign(std::initializer_list<T>);
     void assign(size_type, const T&);
