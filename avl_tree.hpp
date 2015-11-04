@@ -124,8 +124,8 @@ public:
     const_reference front() const;
     reference back();
     const_reference back() const;
-    void insert(const T&);
-    void insert(T&&);
+    iterator insert(const T&);
+    iterator insert(T&&);
     reference operator[](size_type);
     const_reference operator[](size_type) const;
 
