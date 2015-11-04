@@ -8,6 +8,14 @@ public:
     typedef typename A::difference_type difference_type;
     typedef typename A::size_type size_type;
 
+    struct node {
+        T data;
+        short imbalance;
+        int n;
+        iterator left_child;
+        iterator right_child;
+    };
+
     class iterator {
     public:
         typedef typename A::difference_type difference_type;
