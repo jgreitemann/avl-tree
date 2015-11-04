@@ -1,3 +1,7 @@
+#ifndef AVL_TREE_HPP
+#define AVL_TREE_HPP
+#include <memory>
+
 template <class T, class A = std::allocator<T> >
 class avl_tree {
 public:
@@ -137,3 +141,5 @@ public:
 };
 template <class T, class A = std::allocator<T> >
 void swap(X<T,A>&, X<T,A>&);
+
+#endif
