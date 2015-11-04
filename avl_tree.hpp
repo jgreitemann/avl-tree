@@ -126,6 +126,7 @@ public:
     const_reference operator[](size_type) const;
 
     iterator erase(const_iterator);
+    void remove(const_reference);
     void clear();
     template<class iter>
     void assign(iter, iter);
