@@ -2,7 +2,7 @@
 #define AVL_TREE_HPP
 #include <memory>
 
-template <class T, class A = std::allocator<T> >
+template <class T, class A = std::allocator<node> >
 class avl_tree {
 public:
     typedef A allocator_type;
@@ -11,14 +11,6 @@ public:
     typedef typename A::const_reference const_reference;
     typedef typename A::difference_type difference_type;
     typedef typename A::size_type size_type;
-
-    struct node {
-        T data;
-        short imbalance;
-        int n;
-        iterator left_child;
-        iterator right_child;
-    };
 
     class iterator {
     public:
@@ -95,13 +87,25 @@ public:
     typedef std::reverse_iterator<iterator> reverse_iterator;
     typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
-    avl_tree();
-    avl_tree(const avl_tree&);
-    ~avl_tree();
+    avl_tree() {
+        root = null;
+    }
+    avl_tree(const avl_tree& t) {
+        this = t;
+    }
+    ~avl_tree() {
+        clear();
+    }
 
-    avl_tree& operator=(const avl_tree&);
-    bool operator==(const avl_tree&) const;
-    bool operator!=(const avl_tree&) const;
+    avl_tree& operator=(const avl_tree& t) {
+        *root = *(t.root);
+    }
+    bool operator==(const avl_tree& t) const {
+        return *root == *(t.root);
+    }
+    bool operator!=(const avl_tree& t) const {
+        return *root != *(t.root);
+    }
 
     iterator begin();
     const_iterator begin() const;
@@ -127,18 +131,97 @@ public:
 
     iterator erase(const_iterator);
     void remove(const_reference);
-    void clear();
+    void clear() {
+        alloc.destroy(root);
+        alloc.deallocate(root);
+        root = null;
+    }
     template<class iter>
     void assign(iter, iter);
     void assign(std::initializer_list<T>);
     void assign(size_type, const T&);
 
     void swap(const avl_tree&);
-    size_type size();
+    size_type size() {
+        return root->n;
+    }
     size_type max_size();
-    bool empty();
+    bool empty() {
+        return root == null;
+    }
 
     A get_allocator();
+
+private:
+    class node {
+    protected:
+        T data;
+        short imbalance;
+        size_type n;
+        node *left_child;
+        node *right_child;
+
+        node() {
+            left_child = null;
+            right_child = null;
+        }
+        node(const node& nd) {
+            left_child = null;
+            right_child = null;
+            this = nd;
+        }
+        ~node() {
+            if (left_child) {
+                alloc.destroy(left_child);
+                alloc.deallocate(left_child);
+            }
+            if (right_child) {
+                alloc.destroy(right_child);
+                alloc.deallocate(right_child);
+            }
+        }
+
+        node& operator=(const node& nd) {
+            data = nd.data;
+            imbalance = nd.imbalance;
+            n = nd.n;
+            if (left_child) {
+                if (nd.left_child) {
+                    *left_child = *nd.left_child;
+                } else {
+                    alloc.destroy(left_child);
+                    alloc.deallocate(left_child);
+                    left_child = null;
+                }
+            } else {
+                if (nd.left_child) {
+                    left_child = alloc.allocate(1);
+                    alloc.construct(left_child, nd.left_child);
+                } else {
+                    left_child = null;
+                }
+            }
+            if (right_child) {
+                if (nd.right_child) {
+                    *right_child = *nd.right_child;
+                } else {
+                    alloc.destroy(right_child);
+                    alloc.deallocate(right_child);
+                    right_child = null;
+                }
+            } else {
+                if (nd.right_child) {
+                    right_child = alloc.allocate(1);
+                    alloc.construct(right_child, nd.right_child);
+                } else {
+                    right_child = null;
+                }
+            }
+            return this;
+        }
+    };
+    A alloc;
+    node *root;
 };
 template <class T, class A = std::allocator<T> >
 void swap(X<T,A>&, X<T,A>&);
