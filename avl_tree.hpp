@@ -2,7 +2,7 @@
 #define AVL_TREE_HPP
 #include <memory>
 
-template <class T, class A = std::allocator<node> >
+template <typename T, typename A = std::allocator<node> >
 class avl_tree {
 public:
     typedef A allocator_type;
@@ -136,7 +136,7 @@ public:
         alloc.deallocate(root);
         root = null;
     }
-    template<class iter>
+    template<typename iter>
     void assign(iter, iter);
     void assign(std::initializer_list<T>);
     void assign(size_type, const T&);
@@ -223,7 +223,7 @@ private:
     A alloc;
     node *root;
 };
-template <class T, class A = std::allocator<T> >
+template <typename T, typename A = std::allocator<T> >
 void swap(X<T,A>&, X<T,A>&);
 
 #endif
