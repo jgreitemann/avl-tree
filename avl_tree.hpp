@@ -138,7 +138,7 @@ public:
     void remove(const_reference);
     void clear() {
         alloc.destroy(root);
-        alloc.deallocate(root);
+        alloc.deallocate(root, 1);
         root = 0;
     }
     template<typename iter>
@@ -167,6 +167,8 @@ private:
         node *right_child;
 
         node() {
+            imbalance = 0;
+            n = 0;
             left_child = 0;
             right_child = 0;
         }
@@ -178,11 +180,11 @@ private:
         ~node() {
             if (left_child) {
                 alloc.destroy(left_child);
-                alloc.deallocate(left_child);
+                alloc.deallocate(left_child, 1);
             }
             if (right_child) {
                 alloc.destroy(right_child);
-                alloc.deallocate(right_child);
+                alloc.deallocate(right_child, 1);
             }
         }
 
@@ -195,7 +197,7 @@ private:
                     *left_child = *nd.left_child;
                 } else {
                     alloc.destroy(left_child);
-                    alloc.deallocate(left_child);
+                    alloc.deallocate(left_child, 1);
                     left_child = 0;
                 }
             } else {
@@ -211,7 +213,7 @@ private:
                     *right_child = *nd.right_child;
                 } else {
                     alloc.destroy(right_child);
-                    alloc.deallocate(right_child);
+                    alloc.deallocate(right_child, 1);
                     right_child = 0;
                 }
             } else {
