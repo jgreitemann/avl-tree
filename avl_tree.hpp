@@ -88,7 +88,7 @@ public:
     typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
     avl_tree() {
-        root = null;
+        root = 0;
     }
     avl_tree(const avl_tree& t) {
         this = t;
@@ -134,7 +134,7 @@ public:
     void clear() {
         alloc.destroy(root);
         alloc.deallocate(root);
-        root = null;
+        root = 0;
     }
     template<typename iter>
     void assign(iter, iter);
@@ -147,7 +147,7 @@ public:
     }
     size_type max_size();
     bool empty() {
-        return root == null;
+        return root == 0;
     }
 
     A get_allocator();
@@ -162,12 +162,12 @@ private:
         node *right_child;
 
         node() {
-            left_child = null;
-            right_child = null;
+            left_child = 0;
+            right_child = 0;
         }
         node(const node& nd) {
-            left_child = null;
-            right_child = null;
+            left_child = 0;
+            right_child = 0;
             this = nd;
         }
         ~node() {
@@ -191,14 +191,14 @@ private:
                 } else {
                     alloc.destroy(left_child);
                     alloc.deallocate(left_child);
-                    left_child = null;
+                    left_child = 0;
                 }
             } else {
                 if (nd.left_child) {
                     left_child = alloc.allocate(1);
                     alloc.construct(left_child, nd.left_child);
                 } else {
-                    left_child = null;
+                    left_child = 0;
                 }
             }
             if (right_child) {
@@ -207,14 +207,14 @@ private:
                 } else {
                     alloc.destroy(right_child);
                     alloc.deallocate(right_child);
-                    right_child = null;
+                    right_child = 0;
                 }
             } else {
                 if (nd.right_child) {
                     right_child = alloc.allocate(1);
                     alloc.construct(right_child, nd.right_child);
                 } else {
-                    right_child = null;
+                    right_child = 0;
                 }
             }
             return this;
