@@ -98,7 +98,12 @@ public:
     }
 
     avl_tree& operator=(const avl_tree& t) {
-        *root = *(t.root);
+        if (!root) {
+            root = alloc.allocate(1);
+            alloc.construct(root, t.root);
+        } else {
+            *root = *(t.root);
+        }
     }
     bool operator==(const avl_tree& t) const {
         return *root == *(t.root);
