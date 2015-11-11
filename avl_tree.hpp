@@ -129,7 +129,36 @@ public:
     const_reference front() const;
     reference back();
     const_reference back() const;
-    iterator insert(const T&);
+
+    iterator insert(const T& t) {
+        // descent the search tree
+        if (!root) {
+            root = alloc.allocate(1);
+            alloc.construct(root, t);
+        } else {
+            node *parent = root;
+            while (true) {
+                if (t < parent.data) {
+                    if (parent.left_child) {
+                        parent = left_child;
+                    } else {
+                        parent.left_child = alloc.allocate(1);
+                        alloc.construct(parent.left_child, t);
+                        break;
+                    }
+                } else {
+                    if (parent.right_child) {
+                        parent = right_child;
+                    } else {
+                        parent.right_child = alloc.allocate(1);
+                        alloc.construct(parent.right_child, t);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
     iterator insert(T&&);
     reference operator[](size_type);
     const_reference operator[](size_type) const;
@@ -168,7 +197,7 @@ private:
 
         node() {
             imbalance = 0;
-            n = 0;
+            n = 1;
             left_child = 0;
             right_child = 0;
         }
@@ -176,6 +205,13 @@ private:
             left_child = 0;
             right_child = 0;
             this = nd;
+        }
+        node(const T& t) {
+            data = t;
+            imbalance = 0;
+            n = 1;
+            left_child = 0;
+            right_child = 0;
         }
         ~node() {
             if (left_child) {
