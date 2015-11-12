@@ -166,8 +166,18 @@ public:
     reference operator[](size_type);
     const_reference operator[](size_type) const;
 
-    iterator erase(const_iterator);
-    void remove(const_reference);
+    iterator erase(const_iterator it) {
+        node *parent = it->parent;
+        node *ptr = it.ptr;
+        alloc.destroy(ptr);
+        alloc.deallocate(ptr, 1);
+        while (parent) {
+            --parent->n;
+            parent = parent->parent;
+        }
+    }
+
+    // DROP? void remove(const_reference);
     void clear() {
         alloc.destroy(root);
         alloc.deallocate(root, 1);
@@ -180,7 +190,9 @@ public:
 
     void swap(const avl_tree&);
     size_type size() {
-        return root->n;
+        if (root)
+            return root->n;
+        return 0;
     }
     size_type max_size();
     bool empty() {
@@ -271,6 +283,9 @@ private:
             }
             return this;
         }
+
+        bool operator==(const node& n) const;
+        bool operator!=(const node& n) const;
     };
     A alloc;
     node *root;
