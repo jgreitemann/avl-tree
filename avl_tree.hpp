@@ -162,9 +162,45 @@ public:
         }
     }
 
-    iterator insert(T&&);
-    reference operator[](size_type);
-    const_reference operator[](size_type) const;
+    // DROP? iterator insert(T&&);
+
+    reference operator[](size_type i) {
+        // bounds checking
+        if (i >= size()) {
+            throw exception();
+        }
+
+        node *ptr = root;
+        while (true) {
+            if (i < ptr->n) {
+                ptr = ptr->left_child;
+            } else if (i == ptr->n) {
+                return ptr->data;
+            } else {
+                i -= ptr->n;
+                ptr = ptr->right_child;
+            }
+        }
+    }
+
+    const_reference operator[](size_type i) const {
+        // bounds checking
+        if (i >= size()) {
+            throw exception();
+        }
+
+        node *ptr = root;
+        while (true) {
+            if (i < ptr->n) {
+                ptr = ptr->left_child;
+            } else if (i == ptr->n) {
+                return ptr->data;
+            } else {
+                i -= ptr->n;
+                ptr = ptr->right_child;
+            }
+        }
+    }
 
     iterator erase(const_iterator it) {
         node *parent = it->parent;
@@ -178,6 +214,7 @@ public:
     }
 
     // DROP? void remove(const_reference);
+
     void clear() {
         alloc.destroy(root);
         alloc.deallocate(root, 1);
