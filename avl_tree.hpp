@@ -321,8 +321,17 @@ private:
             return this;
         }
 
-        bool operator==(const node& n) const;
-        bool operator!=(const node& n) const;
+        bool operator==(const node& n) const {
+            return data == n.data
+                   && ((left_child == 0 && n.left_child == 0)
+                       || *left_child == *n.left_child)
+                   && ((right_child == 0 && n.right_child == 0)
+                       || *right_child == *n.right_child);
+        }
+
+        bool operator!=(const node& n) const {
+            return !(this == n);
+        }
     };
     A alloc;
     node *root;
