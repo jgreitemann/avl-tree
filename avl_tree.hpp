@@ -144,6 +144,7 @@ public:
                     } else {
                         parent.left_child = alloc.allocate(1);
                         alloc.construct(parent.left_child, t);
+                        parent.left_child->parent = parent;
                         break;
                     }
                 } else {
@@ -152,6 +153,7 @@ public:
                     } else {
                         parent.right_child = alloc.allocate(1);
                         alloc.construct(parent.right_child, t);
+                        parent.right_child->parent = parent;
                         break;
                     }
                 }
@@ -192,12 +194,14 @@ private:
         T data;
         short imbalance;
         size_type n;
+        node *parent;
         node *left_child;
         node *right_child;
 
         node() {
             imbalance = 0;
             n = 1;
+            parent = 0;
             left_child = 0;
             right_child = 0;
         }
@@ -231,6 +235,7 @@ private:
             if (left_child) {
                 if (nd.left_child) {
                     *left_child = *nd.left_child;
+                    left_child->parent = &this;
                 } else {
                     alloc.destroy(left_child);
                     alloc.deallocate(left_child, 1);
@@ -240,6 +245,7 @@ private:
                 if (nd.left_child) {
                     left_child = alloc.allocate(1);
                     alloc.construct(left_child, nd.left_child);
+                    left_child->parent = &this;
                 } else {
                     left_child = 0;
                 }
@@ -247,6 +253,7 @@ private:
             if (right_child) {
                 if (nd.right_child) {
                     *right_child = *nd.right_child;
+                    right_child->parent = &this;
                 } else {
                     alloc.destroy(right_child);
                     alloc.deallocate(right_child, 1);
@@ -256,6 +263,7 @@ private:
                 if (nd.right_child) {
                     right_child = alloc.allocate(1);
                     alloc.construct(right_child, nd.right_child);
+                    right_child->parent = &this;
                 } else {
                     right_child = 0;
                 }
