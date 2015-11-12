@@ -138,22 +138,23 @@ public:
         } else {
             node *parent = root;
             while (true) {
-                if (t < parent.data) {
-                    if (parent.left_child) {
-                        parent = left_child;
+                ++parent->n;
+                if (t < parent->data) {
+                    if (parent->left_child) {
+                        parent = parent->left_child;
                     } else {
-                        parent.left_child = alloc.allocate(1);
-                        alloc.construct(parent.left_child, t);
-                        parent.left_child->parent = parent;
+                        parent->left_child = alloc.allocate(1);
+                        alloc.construct(parent->left_child, t);
+                        parent->left_child->parent = parent;
                         break;
                     }
                 } else {
-                    if (parent.right_child) {
+                    if (parent->right_child) {
                         parent = right_child;
                     } else {
-                        parent.right_child = alloc.allocate(1);
-                        alloc.construct(parent.right_child, t);
-                        parent.right_child->parent = parent;
+                        parent->right_child = alloc.allocate(1);
+                        alloc.construct(parent->right_child, t);
+                        parent->right_child->parent = parent;
                         break;
                     }
                 }
