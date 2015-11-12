@@ -18,42 +18,105 @@ public:
         typedef typename A::value_type value_type;
         typedef typename A::reference reference;
         typedef typename A::pointer pointer;
-        typedef std::random_access_iterator_tag iterator_category;
+        typedef std::bidirectional_iterator_tag iterator_category;
 
-        iterator();
-        iterator(const iterator&);
-        ~iterator();
+        iterator() {
+            ptr = 0;
+        }
 
-        iterator& operator=(const iterator&);
-        bool operator==(const iterator&) const;
-        bool operator!=(const iterator&) const;
+        iterator(const node* p) {
+            ptr = p;
+        }
+
+        iterator(const iterator& it) {
+            ptr = it.ptr;
+        }
+
+        iterator& operator=(const iterator& it) {
+            ptr = it.ptr;
+        }
+
+        bool operator==(const iterator& it) const {
+            return ptr == it.ptr;
+        }
+
+        bool operator!=(const iterator& it) const {
+            return ptr != it.ptr;
+        }
+
+        /* DROP?
         bool operator<(const iterator&) const;
         bool operator>(const iterator&) const;
         bool operator<=(const iterator&) const;
-        bool operator>=(const iterator&) const;
+        bool operator>=(const iterator&) const; */
 
-        iterator& operator++();
-        iterator operator++(int);
-        iterator& operator--();
-        iterator operator--(int);
-        iterator& operator+=(size_type);
-        iterator operator+(size_type) const;
-        friend iterator operator+(size_type, const iterator&);
-        iterator& operator-=(size_type);
-        iterator operator-(size_type) const;
-        difference_type operator-(iterator) const;
+        // pre-increment
+        iterator& operator++() {
+            if (ptr->right_child) {
+                ptr = ptr->right_child;
+                while (ptr->left_child) {
+                    ptr = ptr->left_child;
+                }
+            } else {
+                node *before;
+                do {
+                    before = ptr;
+                    ptr = ptr->parent;
+                } while (before == ptr->right_child);
+            }
+            return *this;
+        }
 
-        reference operator*() const;
-        pointer operator->() const;
-        reference operator[](size_type) const;
+        // post-increment
+        iterator operator++(int) {
+            iterator old(*this);
+            ++(*this);
+            return old;
+        }
+
+        // pre-decrement
+        iterator& operator--() {
+            if (ptr->left_child) {
+                ptr = ptr->left_child;
+                while (ptr->right_child) {
+                    ptr = ptr->right_child;
+                }
+            } else {
+                node *before;
+                do {
+                    before = ptr;
+                    ptr = ptr->parent;
+                } while (before == ptr->left_child);
+            }
+            return *this;
+        }
+
+        // post-decrement
+        iterator operator--(int) {
+            iterator old(*this);
+            --(*this);
+            return old;
+        }
+
+        reference operator*() const {
+            return ptr->data;
+        }
+
+        pointer operator->() const {
+            return &(ptr->data);
+        }
+    protected:
+        node *ptr;
     };
+
+    /* DROP?
     class const_iterator {
     public:
         typedef typename A::difference_type difference_type;
         typedef typename A::value_type value_type;
         typedef typename A::reference const_reference;
         typedef typename A::pointer const_pointer;
-        typedef std::random_access_iterator_tag iterator_category;
+        typedef std::bidirectional_iterator_tag iterator_category;
 
         const_iterator ();
         const_iterator (const const_iterator&);
@@ -82,81 +145,97 @@ public:
         const_reference operator*() const;
         const_pointer operator->() const;
         const_reference operator[](size_type) const;
-    };
+    };*/
 
-    typedef std::reverse_iterator<iterator> reverse_iterator;
-    typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+    //typedef std::reverse_iterator<iterator> reverse_iterator;
+    //typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
     avl_tree() {
-        root = 0;
+        end.n = 0;
     }
     avl_tree(const avl_tree& t) {
-        this = t;
+        *this = t;
     }
     ~avl_tree() {
         clear();
     }
 
     avl_tree& operator=(const avl_tree& t) {
-        if (!root) {
-            root = alloc.allocate(1);
-            alloc.construct(root, t.root);
-        } else {
-            *root = *(t.root);
-        }
+        end = t.end;
     }
     bool operator==(const avl_tree& t) const {
-        return *root == *(t.root);
+        return end == t.end;
     }
     bool operator!=(const avl_tree& t) const {
-        return *root != *(t.root);
+        return end != t.end;
     }
 
-    iterator begin();
-    const_iterator begin() const;
-    const_iterator cbegin() const;
-    iterator end();
-    const_iterator end() const;
-    const_iterator cend() const;
-    reverse_iterator rbegin();
-    const_reverse_iterator rbegin() const;
-    const_reverse_iterator crbegin() const;
-    reverse_iterator rend();
-    const_reverse_iterator rend() const;
-    const_reverse_iterator crend() const;
+    iterator begin() {
+        node *ptr = end;
+        while (ptr->left_child) {
+            ptr = ptr->left_child;
+        }
+        return iterator(ptr);
+    }
 
-    reference front();
-    const_reference front() const;
-    reference back();
-    const_reference back() const;
+    //const_iterator begin() const;
+    //const_iterator cbegin() const;
+
+    iterator end() {
+        return iterator(&end);
+    }
+
+    //const_iterator end() const;
+    //const_iterator cend() const;
+    //reverse_iterator rbegin();
+    //const_reverse_iterator rbegin() const;
+    //const_reverse_iterator crbegin() const;
+    //reverse_iterator rend();
+    //const_reverse_iterator rend() const;
+    //const_reverse_iterator crend() const;
+
+    reference front() {
+        iterator b = begin();
+        return *b;
+    }
+
+    const_reference front() const {
+        iterator b = begin();
+        return *b;
+    }
+
+    reference back() {
+        iterator b = end();
+        return *(--b);
+    }
+
+    const_reference back() const {
+        iterator b = end();
+        return *(--b);
+    }
 
     iterator insert(const T& t) {
         // descent the search tree
-        if (!root) {
-            root = alloc.allocate(1);
-            alloc.construct(root, t);
-        } else {
-            node *parent = root;
-            while (true) {
-                ++parent->n;
-                if (t < parent->data) {
-                    if (parent->left_child) {
-                        parent = parent->left_child;
-                    } else {
-                        parent->left_child = alloc.allocate(1);
-                        alloc.construct(parent->left_child, t);
-                        parent->left_child->parent = parent;
-                        break;
-                    }
+        node *parent = &end;
+        while (true) {
+            ++parent->n;
+            if (parent == &end || t < parent->data) {
+                if (parent->left_child) {
+                    parent = parent->left_child;
                 } else {
-                    if (parent->right_child) {
-                        parent = right_child;
-                    } else {
-                        parent->right_child = alloc.allocate(1);
-                        alloc.construct(parent->right_child, t);
-                        parent->right_child->parent = parent;
-                        break;
-                    }
+                    parent->left_child = alloc.allocate(1);
+                    alloc.construct(parent->left_child, t);
+                    parent->left_child->parent = parent;
+                    break;
+                }
+            } else {
+                if (parent->right_child) {
+                    parent = right_child;
+                } else {
+                    parent->right_child = alloc.allocate(1);
+                    alloc.construct(parent->right_child, t);
+                    parent->right_child->parent = parent;
+                    break;
                 }
             }
         }
@@ -170,7 +249,7 @@ public:
             throw exception();
         }
 
-        node *ptr = root;
+        node *ptr = end.left_child;
         while (true) {
             if (i < ptr->n) {
                 ptr = ptr->left_child;
@@ -189,7 +268,7 @@ public:
             throw exception();
         }
 
-        node *ptr = root;
+        node *ptr = end.left_child;
         while (true) {
             if (i < ptr->n) {
                 ptr = ptr->left_child;
@@ -216,27 +295,31 @@ public:
     // DROP? void remove(const_reference);
 
     void clear() {
-        alloc.destroy(root);
-        alloc.deallocate(root, 1);
-        root = 0;
+        alloc.destroy(end.left_child);
+        alloc.deallocate(end.left_child, 1);
+        end.left_child = 0;
     }
-    template<typename iter>
+
+    /*template<typename iter>
     void assign(iter, iter);
     void assign(std::initializer_list<T>);
     void assign(size_type, const T&);
 
-    void swap(const avl_tree&);
+    void swap(const avl_tree&);*/
+
     size_type size() {
-        if (root)
-            return root->n;
-        return 0;
-    }
-    size_type max_size();
-    bool empty() {
-        return root == 0;
+        return end.n;
     }
 
-    A get_allocator();
+    size_type max_size();
+
+    bool empty() {
+        return end.left_child == 0;
+    }
+
+    A get_allocator() {
+        return alloc;
+    }
 
 private:
     class node {
@@ -258,7 +341,7 @@ private:
         node(const node& nd) {
             left_child = 0;
             right_child = 0;
-            this = nd;
+            *this = nd;
         }
         node(const T& t) {
             data = t;
@@ -285,7 +368,7 @@ private:
             if (left_child) {
                 if (nd.left_child) {
                     *left_child = *nd.left_child;
-                    left_child->parent = &this;
+                    left_child->parent = this;
                 } else {
                     alloc.destroy(left_child);
                     alloc.deallocate(left_child, 1);
@@ -295,7 +378,7 @@ private:
                 if (nd.left_child) {
                     left_child = alloc.allocate(1);
                     alloc.construct(left_child, nd.left_child);
-                    left_child->parent = &this;
+                    left_child->parent = this;
                 } else {
                     left_child = 0;
                 }
@@ -303,7 +386,7 @@ private:
             if (right_child) {
                 if (nd.right_child) {
                     *right_child = *nd.right_child;
-                    right_child->parent = &this;
+                    right_child->parent = this;
                 } else {
                     alloc.destroy(right_child);
                     alloc.deallocate(right_child, 1);
@@ -313,12 +396,12 @@ private:
                 if (nd.right_child) {
                     right_child = alloc.allocate(1);
                     alloc.construct(right_child, nd.right_child);
-                    right_child->parent = &this;
+                    right_child->parent = this;
                 } else {
                     right_child = 0;
                 }
             }
-            return this;
+            return *this;
         }
 
         bool operator==(const node& n) const {
@@ -330,13 +413,13 @@ private:
         }
 
         bool operator!=(const node& n) const {
-            return !(this == n);
+            return !(*this == n);
         }
     };
     A alloc;
-    node *root;
+    node end;
 };
-template <typename T, typename A = std::allocator<T> >
-void swap(X<T,A>&, X<T,A>&);
+//template <typename T, typename A = std::allocator<T> >
+//void swap(X<T,A>&, X<T,A>&);
 
 #endif
