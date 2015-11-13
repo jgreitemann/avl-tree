@@ -2,7 +2,7 @@
 #define AVL_TREE_HPP
 #include <memory>
 
-template <typename T, typename A = std::allocator<node> >
+template <typename T, typename A = std::allocator<T> >
 class avl_tree {
 public:
     typedef A allocator_type;
@@ -416,7 +416,10 @@ private:
             return !(*this == n);
         }
     };
-    A alloc;
+
+    using NodeAlloc = typename std::allocator_traits<A>::template rebind_alloc<node>;
+
+    NodeAlloc alloc;
     node end;
 };
 //template <typename T, typename A = std::allocator<T> >
