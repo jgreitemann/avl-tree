@@ -151,7 +151,7 @@ public:
     //typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
     avl_tree() {
-        end.n = 0;
+        root.n = 0;
     }
     avl_tree(const avl_tree& t) {
         *this = t;
@@ -161,17 +161,17 @@ public:
     }
 
     avl_tree& operator=(const avl_tree& t) {
-        end = t.end;
+        root = t.root;
     }
     bool operator==(const avl_tree& t) const {
-        return end == t.end;
+        return root == t.root;
     }
     bool operator!=(const avl_tree& t) const {
-        return end != t.end;
+        return root != t.root;
     }
 
     iterator begin() {
-        node *ptr = end;
+        node *ptr = &root;
         while (ptr->left_child) {
             ptr = ptr->left_child;
         }
@@ -182,7 +182,7 @@ public:
     //const_iterator cbegin() const;
 
     iterator end() {
-        return iterator(&end);
+        return iterator(&root);
     }
 
     //const_iterator end() const;
@@ -216,10 +216,10 @@ public:
 
     iterator insert(const T& t) {
         // descent the search tree
-        node *parent = &end;
+        node *parent = &root;
         while (true) {
             ++parent->n;
-            if (parent == &end || t < parent->data) {
+            if (parent == &root || t < parent->data) {
                 if (parent->left_child) {
                     parent = parent->left_child;
                 } else {
@@ -249,7 +249,7 @@ public:
             throw exception();
         }
 
-        node *ptr = end.left_child;
+        node *ptr = root.left_child;
         while (true) {
             if (i < ptr->n) {
                 ptr = ptr->left_child;
@@ -268,7 +268,7 @@ public:
             throw exception();
         }
 
-        node *ptr = end.left_child;
+        node *ptr = root.left_child;
         while (true) {
             if (i < ptr->n) {
                 ptr = ptr->left_child;
@@ -295,9 +295,9 @@ public:
     // DROP? void remove(const_reference);
 
     void clear() {
-        alloc.destroy(end.left_child);
-        alloc.deallocate(end.left_child, 1);
-        end.left_child = 0;
+        alloc.destroy(root.left_child);
+        alloc.deallocate(root.left_child, 1);
+        root.left_child = 0;
     }
 
     /*template<typename iter>
@@ -308,13 +308,13 @@ public:
     void swap(const avl_tree&);*/
 
     size_type size() {
-        return end.n;
+        return root.n;
     }
 
     size_type max_size();
 
     bool empty() {
-        return end.left_child == 0;
+        return root.left_child == 0;
     }
 
     A get_allocator() {
@@ -420,7 +420,7 @@ private:
     using NodeAlloc = typename std::allocator_traits<A>::template rebind_alloc<node>;
 
     NodeAlloc alloc;
-    node end;
+    node root;
 };
 //template <typename T, typename A = std::allocator<T> >
 //void swap(X<T,A>&, X<T,A>&);
