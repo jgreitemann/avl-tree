@@ -1,6 +1,9 @@
 #ifndef AVL_TREE_HPP
 #define AVL_TREE_HPP
 #include <memory>
+#include <iterator>
+#include <exception>
+#include <stdexcept>
 
 template <typename T, typename A = std::allocator<T> >
 class avl_tree {
@@ -12,6 +15,104 @@ public:
     typedef typename A::difference_type difference_type;
     typedef typename A::size_type size_type;
 
+private:
+    class node {
+    public:
+        T data;
+        avl_tree *tree;
+        short imbalance;
+        size_type n;
+        node *parent;
+        node *left_child;
+        node *right_child;
+
+        node(avl_tree& tree) : tree(&tree) {
+            imbalance = 0;
+            n = 1;
+            parent = 0;
+            left_child = 0;
+            right_child = 0;
+        }
+        node(avl_tree& tree, const node& nd) : tree(&tree) {
+            left_child = 0;
+            right_child = 0;
+            *this = nd;
+        }
+        node(avl_tree& tree, const T& t) : tree(&tree) {
+            data = t;
+            imbalance = 0;
+            n = 1;
+            left_child = 0;
+            right_child = 0;
+        }
+        ~node() {
+            if (left_child) {
+                tree->alloc.destroy(left_child);
+                tree->alloc.deallocate(left_child, 1);
+            }
+            if (right_child) {
+                tree->alloc.destroy(right_child);
+                tree->alloc.deallocate(right_child, 1);
+            }
+        }
+
+        node& operator=(const node& nd) {
+            data = nd.data;
+            imbalance = nd.imbalance;
+            n = nd.n;
+            if (left_child) {
+                if (nd.left_child) {
+                    *left_child = *nd.left_child;
+                    left_child->parent = this;
+                } else {
+                    tree->alloc.destroy(left_child);
+                    tree->alloc.deallocate(left_child, 1);
+                    left_child = 0;
+                }
+            } else {
+                if (nd.left_child) {
+                    left_child = tree->alloc.allocate(1);
+                    tree->alloc.construct(left_child, *tree, *nd.left_child);
+                    left_child->parent = this;
+                } else {
+                    left_child = 0;
+                }
+            }
+            if (right_child) {
+                if (nd.right_child) {
+                    *right_child = *nd.right_child;
+                    right_child->parent = this;
+                } else {
+                    tree->alloc.destroy(right_child);
+                    tree->alloc.deallocate(right_child, 1);
+                    right_child = 0;
+                }
+            } else {
+                if (nd.right_child) {
+                    right_child = tree->alloc.allocate(1);
+                    tree->alloc.construct(right_child, *tree, *nd.right_child);
+                    right_child->parent = this;
+                } else {
+                    right_child = 0;
+                }
+            }
+            return *this;
+        }
+
+        bool operator==(const node& n) const {
+            return data == n.data && tree == n.tree
+                   && ((left_child == 0 && n.left_child == 0)
+                       || *left_child == *n.left_child)
+                   && ((right_child == 0 && n.right_child == 0)
+                       || *right_child == *n.right_child);
+        }
+
+        bool operator!=(const node& n) const {
+            return !(*this == n);
+        }
+    };
+
+public:
     class iterator {
     public:
         typedef typename A::difference_type difference_type;
@@ -24,7 +125,7 @@ public:
             ptr = 0;
         }
 
-        iterator(const node* p) {
+        iterator(node* p) {
             ptr = p;
         }
 
@@ -119,6 +220,7 @@ public:
         typedef std::bidirectional_iterator_tag iterator_category;
 
         const_iterator ();
+        const_iterator(node*); ??? Where does the const go?
         const_iterator (const const_iterator&);
         const_iterator (const iterator&);
         ~const_iterator();
@@ -150,7 +252,7 @@ public:
     //typedef std::reverse_iterator<iterator> reverse_iterator;
     //typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
-    avl_tree() {
+    avl_tree() : root(*this) {
         root.n = 0;
     }
     avl_tree(const avl_tree& t) {
@@ -162,10 +264,13 @@ public:
 
     avl_tree& operator=(const avl_tree& t) {
         root = t.root;
+        return *this;
     }
+
     bool operator==(const avl_tree& t) const {
         return root == t.root;
     }
+
     bool operator!=(const avl_tree& t) const {
         return root != t.root;
     }
@@ -224,18 +329,18 @@ public:
                     parent = parent->left_child;
                 } else {
                     parent->left_child = alloc.allocate(1);
-                    alloc.construct(parent->left_child, t);
+                    alloc.construct(parent->left_child, *this, t);
                     parent->left_child->parent = parent;
-                    break;
+                    return iterator(parent->left_child);
                 }
             } else {
                 if (parent->right_child) {
-                    parent = right_child;
+                    parent = parent->right_child;
                 } else {
                     parent->right_child = alloc.allocate(1);
-                    alloc.construct(parent->right_child, t);
+                    alloc.construct(parent->right_child, *this, t);
                     parent->right_child->parent = parent;
-                    break;
+                    return iterator(parent->right_child);
                 }
             }
         }
@@ -246,7 +351,7 @@ public:
     reference operator[](size_type i) {
         // bounds checking
         if (i >= size()) {
-            throw exception();
+            throw std::out_of_range("avl_tree[] out-of-range");
         }
 
         node *ptr = root.left_child;
@@ -265,7 +370,7 @@ public:
     const_reference operator[](size_type i) const {
         // bounds checking
         if (i >= size()) {
-            throw exception();
+            throw std::out_of_range("avl_tree[] out-of-range");
         }
 
         node *ptr = root.left_child;
@@ -281,7 +386,8 @@ public:
         }
     }
 
-    iterator erase(const_iterator it) {
+    // make argument const_iterator once its implemented
+    iterator erase(iterator it) {
         node *parent = it->parent;
         node *ptr = it.ptr;
         alloc.destroy(ptr);
@@ -322,103 +428,7 @@ public:
     }
 
 private:
-    class node {
-    protected:
-        T data;
-        short imbalance;
-        size_type n;
-        node *parent;
-        node *left_child;
-        node *right_child;
-
-        node() {
-            imbalance = 0;
-            n = 1;
-            parent = 0;
-            left_child = 0;
-            right_child = 0;
-        }
-        node(const node& nd) {
-            left_child = 0;
-            right_child = 0;
-            *this = nd;
-        }
-        node(const T& t) {
-            data = t;
-            imbalance = 0;
-            n = 1;
-            left_child = 0;
-            right_child = 0;
-        }
-        ~node() {
-            if (left_child) {
-                alloc.destroy(left_child);
-                alloc.deallocate(left_child, 1);
-            }
-            if (right_child) {
-                alloc.destroy(right_child);
-                alloc.deallocate(right_child, 1);
-            }
-        }
-
-        node& operator=(const node& nd) {
-            data = nd.data;
-            imbalance = nd.imbalance;
-            n = nd.n;
-            if (left_child) {
-                if (nd.left_child) {
-                    *left_child = *nd.left_child;
-                    left_child->parent = this;
-                } else {
-                    alloc.destroy(left_child);
-                    alloc.deallocate(left_child, 1);
-                    left_child = 0;
-                }
-            } else {
-                if (nd.left_child) {
-                    left_child = alloc.allocate(1);
-                    alloc.construct(left_child, nd.left_child);
-                    left_child->parent = this;
-                } else {
-                    left_child = 0;
-                }
-            }
-            if (right_child) {
-                if (nd.right_child) {
-                    *right_child = *nd.right_child;
-                    right_child->parent = this;
-                } else {
-                    alloc.destroy(right_child);
-                    alloc.deallocate(right_child, 1);
-                    right_child = 0;
-                }
-            } else {
-                if (nd.right_child) {
-                    right_child = alloc.allocate(1);
-                    alloc.construct(right_child, nd.right_child);
-                    right_child->parent = this;
-                } else {
-                    right_child = 0;
-                }
-            }
-            return *this;
-        }
-
-        bool operator==(const node& n) const {
-            return data == n.data
-                   && ((left_child == 0 && n.left_child == 0)
-                       || *left_child == *n.left_child)
-                   && ((right_child == 0 && n.right_child == 0)
-                       || *right_child == *n.right_child);
-        }
-
-        bool operator!=(const node& n) const {
-            return !(*this == n);
-        }
-    };
-
     using NodeAlloc = typename std::allocator_traits<A>::template rebind_alloc<node>;
-
     NodeAlloc alloc;
     node root;
 };
