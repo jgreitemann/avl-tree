@@ -474,17 +474,28 @@ public:
             throw std::out_of_range("avl_tree[] out-of-range");
         }
 
+        size_type j = i;
         node *ptr = root.left_child;
         while (true) {
-            if (i < ptr->n) {
-                ptr = ptr->left_child;
-            } else if (i == ptr->n) {
-                return ptr->data;
+            if (ptr->left_child) {
+                if (j == ptr->left_child->n) {
+                    break;
+                } else if (j < ptr->left_child->n) {
+                    ptr = ptr->left_child;
+                } else {
+                    j -= 1 + ptr->left_child->n;
+                    ptr = ptr->right_child;
+                }
             } else {
-                i -= ptr->n;
-                ptr = ptr->right_child;
+                if (j == 0) {
+                    break;
+                } else {
+                    --j;
+                    ptr = ptr->right_child;
+                }
             }
         }
+        return ptr->data;
     }
 
     const_reference operator[](size_type i) const {
@@ -493,17 +504,28 @@ public:
             throw std::out_of_range("avl_tree[] out-of-range");
         }
 
-        node *ptr = root.left_child;
+        size_type j = i;
+        const node *ptr = root.left_child;
         while (true) {
-            if (i < ptr->n) {
-                ptr = ptr->left_child;
-            } else if (i == ptr->n) {
-                return ptr->data;
+            if (ptr->left_child) {
+                if (j == ptr->left_child->n) {
+                    break;
+                } else if (j < ptr->left_child->n) {
+                    ptr = ptr->left_child;
+                } else {
+                    j -= 1 + ptr->left_child->n;
+                    ptr = ptr->right_child;
+                }
             } else {
-                i -= ptr->n;
-                ptr = ptr->right_child;
+                if (j == 0) {
+                    break;
+                } else {
+                    --j;
+                    ptr = ptr->right_child;
+                }
             }
         }
+        return ptr->data;
     }
 
     iterator erase(const_iterator it) {

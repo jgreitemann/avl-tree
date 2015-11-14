@@ -20,9 +20,16 @@ int main(int argc, char *argv[]) {
     t.insert(12);
     cout << t << endl;
 
+    cout << "Testing iterator: ";
     avl_tree<int>::const_iterator it;
     for (it = t.begin(); it != t.end(); ++it) {
         cout << *it << " ";
+    }
+    cout << endl;
+
+    cout << "Testing random access: ";
+    for (size_t i = 0; i < t.size(); i++) {
+        cout << t[i] << " ";
     }
     cout << endl;
 
