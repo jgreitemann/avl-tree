@@ -1,5 +1,7 @@
 #ifndef AVL_TREE_HPP
 #define AVL_TREE_HPP
+#include <iostream>
+#include <string>
 #include <memory>
 #include <iterator>
 #include <exception>
@@ -110,6 +112,26 @@ private:
         bool operator!=(const node& n) const {
             return !(*this == n);
         }
+
+        #ifdef DEBUGMODE
+        void print(std::ostream& os, std::string prefix) {
+            os << data << std::endl;
+            if (!left_child && !right_child)
+                return;
+            if (left_child) {
+                os << prefix << "+---";
+                left_child->print(os, prefix + "|   ");
+            } else {
+                os << prefix << "+" << std::endl;
+            }
+            if (right_child) {
+                os << prefix << "+---";
+                right_child->print(os, prefix + "    ");
+            } else {
+                os << prefix << "+" << std::endl;
+            }
+        }
+        #endif
     };
 
 public:
@@ -433,8 +455,22 @@ private:
     using NodeAlloc = typename std::allocator_traits<A>::template rebind_alloc<node>;
     NodeAlloc alloc;
     node root;
+
+    #ifdef DEBUGMODE
+    template <typename U, typename V>
+    friend std::ostream& operator<< (std::ostream& stream, const avl_tree<U,V>& t);
+    #endif
 };
 //template <typename T, typename A = std::allocator<T> >
 //void swap(X<T,A>&, X<T,A>&);
 
+#ifdef DEBUGMODE
+template <typename T, typename A = std::allocator<T> >
+std::ostream& operator<<(std::ostream& os, const avl_tree<T,A>& t) {
+    if (!t.root.left_child)
+        return os << "(empty)" << std::endl;
+    t.root.left_child->print(os, "");
+    return os;
+}
+#endif
 #endif
