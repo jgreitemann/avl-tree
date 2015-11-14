@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
     t.insert(12);
     cout << t << endl;
 
-    avl_tree<int>::iterator it;
+    avl_tree<int>::const_iterator it;
     for (it = t.begin(); it != t.end(); ++it) {
         cout << *it << " ";
     }

@@ -136,6 +136,8 @@ private:
 
 public:
     class iterator {
+        template <typename U, typename V>
+        friend class avl_tree<U,V>::const_iterator;
     public:
         typedef typename A::difference_type difference_type;
         typedef typename A::value_type value_type;
@@ -168,11 +170,21 @@ public:
             return ptr != it.ptr;
         }
 
-        /* DROP?
-        bool operator<(const iterator&) const;
-        bool operator>(const iterator&) const;
-        bool operator<=(const iterator&) const;
-        bool operator>=(const iterator&) const; */
+        bool operator<(const iterator& it) const {
+            return **this < *it;
+        }
+
+        bool operator>(const iterator& it) const {
+            return **this > *it;
+        }
+
+        bool operator<=(const iterator& it) const {
+            return **this <= *it;
+        }
+
+        bool operator>=(const iterator& it) const {
+            return **this >= *it;
+        }
 
         // pre-increment
         iterator& operator++() {
@@ -182,7 +194,7 @@ public:
                     ptr = ptr->left_child;
                 }
             } else {
-                node *before;
+                pointer before;
                 do {
                     before = ptr;
                     ptr = ptr->parent;
@@ -206,7 +218,7 @@ public:
                     ptr = ptr->right_child;
                 }
             } else {
-                node *before;
+                node* before;
                 do {
                     before = ptr;
                     ptr = ptr->parent;
@@ -229,11 +241,10 @@ public:
         pointer operator->() const {
             return &(ptr->data);
         }
-    protected:
+    private:
         node *ptr;
     };
 
-    /* DROP?
     class const_iterator {
     public:
         typedef typename A::difference_type difference_type;
@@ -242,35 +253,109 @@ public:
         typedef typename A::pointer const_pointer;
         typedef std::bidirectional_iterator_tag iterator_category;
 
-        const_iterator ();
-        const_iterator(node*); ??? Where does the const go?
-        const_iterator (const const_iterator&);
-        const_iterator (const iterator&);
-        ~const_iterator();
+        const_iterator () {
+            ptr = 0;
+        }
 
-        const_iterator& operator=(const const_iterator&);
-        bool operator==(const const_iterator&) const;
-        bool operator!=(const const_iterator&) const;
-        bool operator<(const const_iterator&) const;
-        bool operator>(const const_iterator&) const;
-        bool operator<=(const const_iterator&) const;
-        bool operator>=(const const_iterator&) const;
+        const_iterator(const node* p) {
+            ptr = p;
+        }
 
-        const_iterator& operator++();
-        const_iterator operator++(int);
-        const_iterator& operator--();
-        const_iterator operator--(int);
-        const_iterator& operator+=(size_type);
-        const_iterator operator+(size_type) const;
-        friend const_iterator operator+(size_type, const const_iterator&);
-        const_iterator& operator-=(size_type);
-        const_iterator operator-(size_type) const;
-        difference_type operator-(const_iterator) const;
+        const_iterator (const const_iterator& it) {
+            ptr = it.ptr;
+        }
 
-        const_reference operator*() const;
-        const_pointer operator->() const;
-        const_reference operator[](size_type) const;
-    };*/
+        const_iterator (const iterator& it) {
+            ptr = it.ptr;
+        }
+
+        const_iterator& operator=(const const_iterator& it) {
+            ptr = it.ptr;
+            return *this;
+        }
+
+        bool operator==(const const_iterator& it) const {
+            return ptr == it.ptr;
+        }
+
+        bool operator!=(const const_iterator& it) const {
+            return ptr != it.ptr;
+        }
+
+        bool operator<(const const_iterator& it) const {
+            return **this < *it;
+        }
+
+        bool operator>(const const_iterator& it) const {
+            return **this > *it;
+        }
+
+        bool operator<=(const const_iterator& it) const {
+            return **this <= *it;
+        }
+
+        bool operator>=(const const_iterator& it) const {
+            return **this >= *it;
+        }
+
+        // pre-increment
+        const_iterator& operator++() {
+            if (ptr->right_child) {
+                ptr = ptr->right_child;
+                while (ptr->left_child) {
+                    ptr = ptr->left_child;
+                }
+            } else {
+                const node* before;
+                do {
+                    before = ptr;
+                    ptr = ptr->parent;
+                } while (before == ptr->right_child);
+            }
+            return *this;
+        }
+
+        // post-increment
+        const_iterator operator++(int) {
+            iterator old(*this);
+            ++(*this);
+            return old;
+        }
+
+        // pre-decrement
+        const_iterator& operator--() {
+            if (ptr->left_child) {
+                ptr = ptr->left_child;
+                while (ptr->right_child) {
+                    ptr = ptr->right_child;
+                }
+            } else {
+                const_pointer before;
+                do {
+                    before = ptr;
+                    ptr = ptr->parent;
+                } while (before == ptr->left_child);
+            }
+            return *this;
+        }
+
+        // post-decrement
+        const_iterator operator--(int) {
+            iterator old(*this);
+            --(*this);
+            return old;
+        }
+
+        const_reference operator*() const {
+            return (const_reference)(ptr->data);
+        }
+
+        const_pointer operator->() const {
+            return &(ptr->data);
+        }
+    private:
+        const node *ptr;
+    };
 
     //typedef std::reverse_iterator<iterator> reverse_iterator;
     //typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
@@ -306,21 +391,33 @@ public:
         return iterator(ptr);
     }
 
-    //const_iterator begin() const;
-    //const_iterator cbegin() const;
+    const_iterator begin() const {
+        const node *ptr = &root;
+        while (ptr->left_child) {
+            ptr = ptr->left_child;
+        }
+        return const_iterator(ptr);
+    }
+
+    const_iterator cbegin() const {
+        const node *ptr = &root;
+        while (ptr->left_child) {
+            ptr = ptr->left_child;
+        }
+        return const_iterator(ptr);
+    }
 
     iterator end() {
         return iterator(&root);
     }
 
-    //const_iterator end() const;
-    //const_iterator cend() const;
-    //reverse_iterator rbegin();
-    //const_reverse_iterator rbegin() const;
-    //const_reverse_iterator crbegin() const;
-    //reverse_iterator rend();
-    //const_reverse_iterator rend() const;
-    //const_reverse_iterator crend() const;
+    const_iterator end() const {
+        return const_iterator(&root);
+    }
+
+    const_iterator cend() const {
+        return const_iterator(&root);
+    }
 
     reference front() {
         iterator b = begin();
@@ -409,8 +506,7 @@ public:
         }
     }
 
-    // make argument const_iterator once its implemented
-    iterator erase(iterator it) {
+    iterator erase(const_iterator it) {
         node *parent = it->parent;
         node *ptr = it.ptr;
         alloc.destroy(ptr);
