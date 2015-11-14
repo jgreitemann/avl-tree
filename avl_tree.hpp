@@ -401,9 +401,11 @@ public:
     // DROP? void remove(const_reference);
 
     void clear() {
-        alloc.destroy(root.left_child);
-        alloc.deallocate(root.left_child, 1);
-        root.left_child = 0;
+        if (root.left_child) {
+            alloc.destroy(root.left_child);
+            alloc.deallocate(root.left_child, 1);
+            root.left_child = 0;
+        }
     }
 
     /*template<typename iter>
