@@ -157,6 +157,7 @@ public:
 
         iterator& operator=(const iterator& it) {
             ptr = it.ptr;
+            return *this;
         }
 
         bool operator==(const iterator& it) const {
