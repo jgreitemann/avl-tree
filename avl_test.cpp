@@ -19,6 +19,13 @@ int main(int argc, char *argv[]) {
     t2 = t;
     t.insert(12);
     cout << t << endl;
+
+    avl_tree<int>::iterator it;
+    for (it = t.begin(); it != t.end(); ++it) {
+        cout << *it << " ";
+    }
+    cout << endl;
+
     //t.remove(1);
     //cout << t << endl;
     //t2.remove(8);
