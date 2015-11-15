@@ -537,8 +537,10 @@ public:
         node *s;
         if (q->left_child) {
             s = q->left_child;
+            q->left_child = 0;
         } else {
             s = q->right_child;
+            q->right_child = 0;
         }
         if (s) {
             s->parent = q->parent;
