@@ -12,7 +12,9 @@ int main(int argc, char *argv[]) {
         t.insert(nums[i]);
         cout << t << endl;
     }
-    //t.remove(6);
+    t.insert(6);
+    cout << t << endl;
+    t.remove(6);
     cout << t << endl;
     t.insert(14);
     cout << t << endl;
@@ -33,10 +35,13 @@ int main(int argc, char *argv[]) {
     }
     cout << endl;
 
-    //t.remove(1);
-    //cout << t << endl;
-    //t2.remove(8);
-    //cout << t2 << endl;
+    it = t.find(7);
+    cout << "Finding element 7: " << *it << endl;
+
+    t.remove(1);
+    cout << t << endl;
+    t2.remove(8);
+    cout << t2 << endl;
 
     t.clear();
     t2.clear();

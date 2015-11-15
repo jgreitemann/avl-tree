@@ -115,7 +115,7 @@ private:
 
         #ifdef DEBUGMODE
         void print(std::ostream& os, std::string prefix) {
-            os << data << std::endl;
+            os << "(" << data << "," << n << "," << imbalance << ")" << std::endl;
             if (!left_child && !right_child)
                 return;
             if (left_child) {
@@ -138,6 +138,7 @@ public:
     class iterator {
         template <typename U, typename V>
         friend class avl_tree<U,V>::const_iterator;
+        friend class avl_tree;
     public:
         typedef typename A::difference_type difference_type;
         typedef typename A::value_type value_type;
@@ -194,7 +195,7 @@ public:
                     ptr = ptr->left_child;
                 }
             } else {
-                pointer before;
+                node* before;
                 do {
                     before = ptr;
                     ptr = ptr->parent;
@@ -330,7 +331,7 @@ public:
                     ptr = ptr->right_child;
                 }
             } else {
-                const_pointer before;
+                const node* before;
                 do {
                     before = ptr;
                     ptr = ptr->parent;
@@ -356,9 +357,6 @@ public:
     private:
         const node *ptr;
     };
-
-    //typedef std::reverse_iterator<iterator> reverse_iterator;
-    //typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
     avl_tree() : root(*this) {
         root.n = 0;
@@ -466,8 +464,6 @@ public:
         }
     }
 
-    // DROP? iterator insert(T&&);
-
     reference operator[](size_type i) {
         // bounds checking
         if (i >= size()) {
@@ -528,18 +524,65 @@ public:
         return ptr->data;
     }
 
-    iterator erase(const_iterator it) {
-        node *parent = it->parent;
+    iterator erase(iterator it) {
+        iterator itn(it);
+        ++itn;
         node *ptr = it.ptr;
-        alloc.destroy(ptr);
-        alloc.deallocate(ptr, 1);
-        while (parent) {
-            --parent->n;
-            parent = parent->parent;
+        node *q;
+        if (!ptr->left_child || !ptr->right_child) {
+            q = ptr;
+        } else {
+            q = itn.ptr;
         }
+        node *s;
+        if (q->left_child) {
+            s = q->left_child;
+        } else {
+            s = q->right_child;
+        }
+        if (s) {
+            s->parent = q->parent;
+        }
+        if (q == q->parent->left_child) {
+            q->parent->left_child = s;
+        } else {
+            q->parent->right_child = s;
+        }
+        if (q != ptr) {
+            ptr->data = q->data;
+            itn = iterator(ptr);
+        }
+        node *parent;
+        for (parent = q->parent; parent; parent = parent->parent) {
+            --parent->n;
+        }
+        alloc.destroy(q);
+        alloc.deallocate(q, 1);
+        return itn;
     }
 
-    // DROP? void remove(const_reference);
+    iterator find(const_reference t) {
+        node *ptr = root.left_child;
+        while (ptr) {
+            if (t == ptr->data) {
+                return iterator(ptr);
+            } else if (t < ptr->data) {
+                ptr = ptr->left_child;
+            } else {
+                ptr = ptr->right_child;
+            }
+        }
+        return end();
+    }
+
+    void remove(const_reference t) {
+        iterator it = find(t);
+        if (it == end())
+            return;
+        do {
+            it = erase(it);
+        } while(*it == t);
+    }
 
     void clear() {
         if (root.left_child) {
