@@ -12,15 +12,11 @@ int main(int argc, char *argv[]) {
         t.insert(nums[i]);
         cout << t << endl;
     }
-    t.insert(6);
-    cout << t << endl;
-    t.remove(6);
-    cout << t << endl;
     t.insert(14);
-    cout << t << endl;
+    cout << "inserted 14:" << endl << t << endl;
     t2 = t;
     t.insert(12);
-    cout << t << endl;
+    cout << "inserted 12 in t:" << endl << t << endl;
 
     cout << "Testing iterator: ";
     avl_tree<int>::const_iterator it;
@@ -39,9 +35,11 @@ int main(int argc, char *argv[]) {
     cout << "Finding element 7: " << *it << endl;
 
     t.remove(1);
-    cout << t << endl;
+    cout << "removed 1 from t:" << endl << t << endl;
     t2.remove(8);
-    cout << t2 << endl;
+    cout << "removed 8 from t2:" << endl << t2 << endl;
+    t2.remove(16);
+    cout << "removed 16 from t2:" << endl << t2 << endl;
 
     t.clear();
     t2.clear();

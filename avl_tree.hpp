@@ -2,6 +2,7 @@
 #define AVL_TREE_HPP
 #include <iostream>
 #include <string>
+#include <algorithm>
 #include <memory>
 #include <iterator>
 #include <exception>
@@ -22,14 +23,14 @@ private:
     public:
         T data;
         avl_tree *tree;
-        short imbalance;
+        short depth;
         size_type n;
         node *parent;
         node *left_child;
         node *right_child;
 
         node(avl_tree& tree) : tree(&tree) {
-            imbalance = 0;
+            depth = 1;
             n = 1;
             parent = 0;
             left_child = 0;
@@ -42,7 +43,7 @@ private:
         }
         node(avl_tree& tree, const T& t) : tree(&tree) {
             data = t;
-            imbalance = 0;
+            depth = 1;
             n = 1;
             left_child = 0;
             right_child = 0;
@@ -60,7 +61,7 @@ private:
 
         node& operator=(const node& nd) {
             data = nd.data;
-            imbalance = nd.imbalance;
+            depth = nd.depth;
             n = nd.n;
             if (left_child) {
                 if (nd.left_child) {
@@ -115,7 +116,7 @@ private:
 
         #ifdef DEBUGMODE
         void print(std::ostream& os, std::string prefix) {
-            os << "(" << data << "," << n << "," << imbalance << ")" << std::endl;
+            os << "(" << data << "," << n << "," << depth << ")" << std::endl;
             if (!left_child && !right_child)
                 return;
             if (left_child) {
@@ -438,6 +439,8 @@ public:
     }
 
     iterator insert(const T& t) {
+        iterator res;
+
         // descent the search tree
         node *parent = &root;
         while (true) {
@@ -449,7 +452,8 @@ public:
                     parent->left_child = alloc.allocate(1);
                     alloc.construct(parent->left_child, *this, t);
                     parent->left_child->parent = parent;
-                    return iterator(parent->left_child);
+                    res = iterator(parent->left_child);
+                    break;
                 }
             } else {
                 if (parent->right_child) {
@@ -458,10 +462,20 @@ public:
                     parent->right_child = alloc.allocate(1);
                     alloc.construct(parent->right_child, *this, t);
                     parent->right_child->parent = parent;
-                    return iterator(parent->right_child);
+                    res = iterator(parent->right_child);
+                    break;
                 }
             }
         }
+        short branch_depth = 1;
+        do {
+            if (parent->depth > branch_depth)
+                break;
+            parent->depth = 1 + branch_depth;
+            branch_depth = parent->depth;
+            parent = parent->parent;
+        } while(parent);
+        return res;
     }
 
     reference operator[](size_type i) {
@@ -557,6 +571,8 @@ public:
         node *parent;
         for (parent = q->parent; parent; parent = parent->parent) {
             --parent->n;
+            parent->depth = 1 + std::max(parent->left_child ? parent->left_child->depth : 0,
+                                         parent->right_child ? parent->right_child->depth : 0);
         }
         alloc.destroy(q);
         alloc.deallocate(q, 1);
