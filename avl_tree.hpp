@@ -477,6 +477,23 @@ public:
             if (parent->depth > branch_depth)
                 break;
             parent->depth = 1 + branch_depth;
+            if (parent == &root)
+                break;
+            if (parent->left_child->depth > parent->right_child->depth + 1) {
+                // check for double-rotation case
+                if (parent->left_child->left_child->depth < parent->left_child->right_child->depth) {
+                    rotate_left(parent->left_child);
+                }
+                rotate_right(parent);
+                break;
+            } else if (parent->left_child->depth < parent->right_child->depth - 1) {
+                // check for double-rotation case
+                if (parent->right_child->left_child->depth > parent->right_child->right_child->depth) {
+                    rotate_right(parent->right_child);
+                }
+                rotate_left(parent);
+                break;
+            }
             branch_depth = parent->depth;
             parent = parent->parent;
         } while(parent);
