@@ -133,6 +133,11 @@ private:
             }
         }
         #endif
+
+        void update_depth() {
+            depth = 1 + std::max(left_child ? left_child->depth : 0,
+                                 right_child ? right_child->depth : 0);
+        }
     };
 
 public:
@@ -571,8 +576,7 @@ public:
         node *parent;
         for (parent = q->parent; parent; parent = parent->parent) {
             --parent->n;
-            parent->depth = 1 + std::max(parent->left_child ? parent->left_child->depth : 0,
-                                         parent->right_child ? parent->right_child->depth : 0);
+            parent->update_depth();
         }
         alloc.destroy(q);
         alloc.deallocate(q, 1);
@@ -632,6 +636,46 @@ public:
     }
 
 private:
+    void rotate_left(node *n) {
+        node *tmp = n->right_child->left_child;
+        if (n == n->parent->left_child) {
+            n->parent->left_child = n->right_child;
+        } else {
+            n->parent->right_child = n->right_child;
+        }
+        n->right_child->parent = n->parent;
+        n->right_child->left_child = n;
+        n->parent = n->right_child;
+        n->right_child = tmp;
+        tmp->parent = n;
+
+        // update depths
+        do {
+            n->update_depth();
+            n = n->parent;
+        } while (n);
+    }
+
+    void rotate_right(node *n) {
+        node *tmp = n->left_child->right_child;
+        if (n == n->parent->left_child) {
+            n->parent->left_child = n->left_child;
+        } else {
+            n->parent->right_child = n->left_child;
+        }
+        n->left_child->parent = n->parent;
+        n->left_child->right_child = n;
+        n->parent = n->left_child;
+        n->left_child = tmp;
+        tmp->parent = n;
+
+        // update depths
+        do {
+            n->update_depth();
+            n = n->parent;
+        } while (n);
+    }
+
     using NodeAlloc = typename std::allocator_traits<A>::template rebind_alloc<node>;
     NodeAlloc alloc;
     node root;
