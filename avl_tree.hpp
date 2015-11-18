@@ -138,6 +138,16 @@ private:
             depth = 1 + std::max(left_child ? left_child->depth : 0,
                                  right_child ? right_child->depth : 0);
         }
+
+        void update_n() {
+            n = 1 + (left_child ? left_child->n : 0)
+                + (right_child ? right_child->n : 0);
+        }
+
+        short imbalance() {
+            return (right_child ? right_child->depth : 0)
+                   - (left_child ? left_child->depth : 0);
+        }
     };
 
 public:
@@ -479,16 +489,16 @@ public:
             parent->depth = 1 + branch_depth;
             if (parent == &root)
                 break;
-            if (parent->left_child->depth > parent->right_child->depth + 1) {
+            if (parent->imbalance() < -1) {
                 // check for double-rotation case
-                if (parent->left_child->left_child->depth < parent->left_child->right_child->depth) {
+                if (parent->left_child->imbalance() > 0) {
                     rotate_left(parent->left_child);
                 }
                 rotate_right(parent);
                 break;
-            } else if (parent->left_child->depth < parent->right_child->depth - 1) {
+            } else if (parent->imbalance() > 1) {
                 // check for double-rotation case
-                if (parent->right_child->left_child->depth > parent->right_child->right_child->depth) {
+                if (parent->right_child->imbalance() < 0) {
                     rotate_right(parent->right_child);
                 }
                 rotate_left(parent);
@@ -664,7 +674,12 @@ private:
         n->right_child->left_child = n;
         n->parent = n->right_child;
         n->right_child = tmp;
-        tmp->parent = n;
+        if (tmp)
+            tmp->parent = n;
+
+        // update ns
+        n->update_n();
+        n->parent->update_n();
 
         // update depths
         do {
@@ -684,7 +699,12 @@ private:
         n->left_child->right_child = n;
         n->parent = n->left_child;
         n->left_child = tmp;
-        tmp->parent = n;
+        if (tmp)
+            tmp->parent = n;
+
+        // update ns
+        n->update_n();
+        n->parent->update_n();
 
         // update depths
         do {
