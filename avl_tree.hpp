@@ -332,7 +332,7 @@ public:
 
         // post-increment
         const_iterator operator++(int) {
-            iterator old(*this);
+            const_iterator old(*this);
             ++(*this);
             return old;
         }
@@ -356,7 +356,7 @@ public:
 
         // post-decrement
         const_iterator operator--(int) {
-            iterator old(*this);
+            const_iterator old(*this);
             --(*this);
             return old;
         }
