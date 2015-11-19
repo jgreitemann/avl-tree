@@ -146,6 +146,21 @@ private:
             }
         }
         #endif
+
+        void update_depth() {
+            depth = 1 + std::max(left_child ? left_child->depth : 0,
+                                 right_child ? right_child->depth : 0);
+        }
+
+        void update_n() {
+            n = 1 + (left_child ? left_child->n : 0)
+                + (right_child ? right_child->n : 0);
+        }
+
+        short imbalance() {
+            return (right_child ? right_child->depth : 0)
+                   - (left_child ? left_child->depth : 0);
+        }
     };
 
 public:
@@ -485,6 +500,23 @@ public:
             if (parent->depth > branch_depth)
                 break;
             parent->depth = 1 + branch_depth;
+            if (parent == &root)
+                break;
+            if (parent->imbalance() < -1) {
+                // check for double-rotation case
+                if (parent->left_child->imbalance() > 0) {
+                    rotate_left(parent->left_child);
+                }
+                rotate_right(parent);
+                break;
+            } else if (parent->imbalance() > 1) {
+                // check for double-rotation case
+                if (parent->right_child->imbalance() < 0) {
+                    rotate_right(parent->right_child);
+                }
+                rotate_left(parent);
+                break;
+            }
             branch_depth = parent->depth;
             parent = parent->parent;
         } while(parent);
@@ -584,8 +616,26 @@ public:
         node *parent;
         for (parent = q->parent; parent; parent = parent->parent) {
             --parent->n;
-            parent->depth = 1 + std::max(parent->left_child ? parent->left_child->depth : 0,
-                                         parent->right_child ? parent->right_child->depth : 0);
+        }
+        for (parent = q->parent; parent; parent = parent->parent) {
+            parent->update_depth();
+            if (parent == &root)
+                break;
+            if (parent->imbalance() < -1) {
+                // check for double-rotation case
+                if (parent->left_child->imbalance() > 0) {
+                    rotate_left(parent->left_child);
+                }
+                rotate_right(parent);
+                break;
+            } else if (parent->imbalance() > 1) {
+                // check for double-rotation case
+                if (parent->right_child->imbalance() < 0) {
+                    rotate_right(parent->right_child);
+                }
+                rotate_left(parent);
+                break;
+            }
         }
         alloc.destroy(q);
         alloc.deallocate(q, 1);
@@ -645,6 +695,56 @@ public:
     }
 
 private:
+    void rotate_left(node *n) {
+        node *tmp = n->right_child->left_child;
+        if (n == n->parent->left_child) {
+            n->parent->left_child = n->right_child;
+        } else {
+            n->parent->right_child = n->right_child;
+        }
+        n->right_child->parent = n->parent;
+        n->right_child->left_child = n;
+        n->parent = n->right_child;
+        n->right_child = tmp;
+        if (tmp)
+            tmp->parent = n;
+
+        // update ns
+        n->update_n();
+        n->parent->update_n();
+
+        // update depths
+        do {
+            n->update_depth();
+            n = n->parent;
+        } while (n);
+    }
+
+    void rotate_right(node *n) {
+        node *tmp = n->left_child->right_child;
+        if (n == n->parent->left_child) {
+            n->parent->left_child = n->left_child;
+        } else {
+            n->parent->right_child = n->left_child;
+        }
+        n->left_child->parent = n->parent;
+        n->left_child->right_child = n;
+        n->parent = n->left_child;
+        n->left_child = tmp;
+        if (tmp)
+            tmp->parent = n;
+
+        // update ns
+        n->update_n();
+        n->parent->update_n();
+
+        // update depths
+        do {
+            n->update_depth();
+            n = n->parent;
+        } while (n);
+    }
+
     using NodeAlloc = typename std::allocator_traits<A>::template rebind_alloc<node>;
     NodeAlloc alloc;
     node root;

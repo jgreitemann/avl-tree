@@ -11,52 +11,55 @@
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //    GNU General Public License for more details.
 
-#define DEBUGMODE
 #include "avl_tree.hpp"
 #include <iostream>
-#include <assert.h>
+#include <random>
+#include <cassert>
+#include <iterator>
 
 using namespace std;
 
 int main(int argc, char *argv[]) {
-    avl_tree<int> t, t2;
-    int nums[] = {17, 6, 8, 7, 13, 1, 16};
-    for (int i = 0; i < 7; ++i) {
-        t.insert(nums[i]);
-        cout << t << endl;
+    avl_tree<double> t;
+    const unsigned N = 100000;
+
+    mt19937 rng;
+    uniform_real_distribution<double> uniform;
+
+    // fill with random numbers
+    size_t i;
+    for (i = 0; i < N; i++) {
+        t.insert(uniform(rng));
     }
-    t.insert(14);
-    cout << "inserted 14:" << endl << t << endl;
-    t2 = t;
-    t.insert(12);
-    cout << "inserted 12 in t:" << endl << t << endl;
 
-    cout << "Testing iterator: ";
-    avl_tree<int>::const_iterator it;
-    for (it = t.begin(); it != t.end(); ++it) {
-        cout << *it << " ";
+    // check ordering and consistent indices/iterators
+    avl_tree<double>::const_iterator it;
+    double last = 0.;
+    for (it = t.begin(), i = 0; it != t.end(); ++it, ++i) {
+        assert(*it == t[i]);
+        assert(last <= *it);
+        last = *it;
     }
-    cout << endl;
 
-    cout << "Testing random access: ";
-    for (size_t i = 0; i < t.size(); i++) {
-        cout << t[i] << " ";
+    // randomly pick elements and delete
+    avl_tree<double>::iterator it2;
+    size_t d;
+    for (size_t i = 0; i < N; i++) {
+        // check again half-way in
+        if (i == N/2) {
+            last = 0.;
+            for (it = t.begin(), i = 0; it != t.end(); it++, ++i) {
+                assert(*it == t[i]);
+                assert(last <= *it);
+                last = *it;
+            }
+        }
+
+        d = (size_t)(t.size() * uniform(rng));
+        it2 = t.begin();
+        advance(it2, d);
+        t.erase(it2);
     }
-    cout << endl;
-
-    it = t.find(7);
-    cout << "Finding element 7: " << *it << endl;
-
-    t.remove(1);
-    cout << "removed 1 from t:" << endl << t << endl;
-    t2.remove(8);
-    cout << "removed 8 from t2:" << endl << t2 << endl;
-    t2.remove(16);
-    cout << "removed 16 from t2:" << endl << t2 << endl;
-
-    t.clear();
-    t2.clear();
-    cout << t << endl;
 
     return 0;
 }
