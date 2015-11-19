@@ -603,7 +603,26 @@ public:
         node *parent;
         for (parent = q->parent; parent; parent = parent->parent) {
             --parent->n;
+        }
+        for (parent = q->parent; parent; parent = parent->parent) {
             parent->update_depth();
+            if (parent == &root)
+                break;
+            if (parent->imbalance() < -1) {
+                // check for double-rotation case
+                if (parent->left_child->imbalance() > 0) {
+                    rotate_left(parent->left_child);
+                }
+                rotate_right(parent);
+                break;
+            } else if (parent->imbalance() > 1) {
+                // check for double-rotation case
+                if (parent->right_child->imbalance() < 0) {
+                    rotate_right(parent->right_child);
+                }
+                rotate_left(parent);
+                break;
+            }
         }
         alloc.destroy(q);
         alloc.deallocate(q, 1);

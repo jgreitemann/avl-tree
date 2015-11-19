@@ -12,6 +12,8 @@ int main(int argc, char *argv[]) {
         t.insert(nums[i]);
         cout << t << endl;
     }
+    t.remove(6);
+    cout << "removed 6:" << endl << t << endl;
     t.insert(14);
     cout << "inserted 14:" << endl << t << endl;
     t2 = t;
