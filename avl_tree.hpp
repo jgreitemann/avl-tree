@@ -523,10 +523,10 @@ public:
         return res;
     }
 
-    reference operator[](size_type i) {
+    iterator at(size_type i) {
         // bounds checking
         if (i >= size()) {
-            throw std::out_of_range("avl_tree[] out-of-range");
+            throw std::out_of_range("avl_tree::at out-of-range");
         }
 
         size_type j = i;
@@ -550,10 +550,10 @@ public:
                 }
             }
         }
-        return ptr->data;
+        return iterator(ptr);
     }
 
-    const_reference operator[](size_type i) const {
+    const_iterator at(size_type i) const {
         // bounds checking
         if (i >= size()) {
             throw std::out_of_range("avl_tree[] out-of-range");
@@ -580,7 +580,15 @@ public:
                 }
             }
         }
-        return ptr->data;
+        return const_iterator(ptr);
+    }
+
+    reference operator[](size_type i) {
+        return *at(i);
+    }
+
+    const_reference operator[](size_type i) const {
+        return *at(i);
     }
 
     iterator erase(iterator it) {
