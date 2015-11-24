@@ -15,13 +15,12 @@
 #include <iostream>
 #include <random>
 #include <cassert>
-#include <iterator>
 
 using namespace std;
 
 int main(int argc, char *argv[]) {
     avl_tree<double> t;
-    const unsigned N = 100000;
+    const unsigned N = 1000000;
 
     mt19937 rng;
     uniform_real_distribution<double> uniform;
@@ -56,8 +55,7 @@ int main(int argc, char *argv[]) {
         }
 
         d = (size_t)(t.size() * uniform(rng));
-        it2 = t.begin();
-        advance(it2, d);
+        it2 = t.at(d);
         t.erase(it2);
     }
 
