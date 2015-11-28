@@ -387,31 +387,35 @@ public:
         const node *ptr;
     };
 
-    avl_tree() : root(*this) {
-        root.n = 0;
+    avl_tree() {
+        root = alloc.allocate(1);
+        alloc.construct(root, *this);
+        root->n = 0;
     }
     avl_tree(const avl_tree& t) {
         *this = t;
     }
     ~avl_tree() {
-        clear();
+        alloc.destroy(root);
+        alloc.deallocate(root, 1);
     }
 
     avl_tree& operator=(const avl_tree& t) {
-        root = t.root;
+        root = alloc.allocate(1);
+        alloc.construct(root, *t.root);
         return *this;
     }
 
     bool operator==(const avl_tree& t) const {
-        return root == t.root;
+        return *root == *t.root;
     }
 
     bool operator!=(const avl_tree& t) const {
-        return root != t.root;
+        return *root != *t.root;
     }
 
     iterator begin() {
-        node *ptr = &root;
+        node *ptr = root;
         while (ptr->left_child) {
             ptr = ptr->left_child;
         }
@@ -419,7 +423,7 @@ public:
     }
 
     const_iterator begin() const {
-        const node *ptr = &root;
+        const node *ptr = root;
         while (ptr->left_child) {
             ptr = ptr->left_child;
         }
@@ -427,7 +431,7 @@ public:
     }
 
     const_iterator cbegin() const {
-        const node *ptr = &root;
+        const node *ptr = root;
         while (ptr->left_child) {
             ptr = ptr->left_child;
         }
@@ -435,15 +439,15 @@ public:
     }
 
     iterator end() {
-        return iterator(&root);
+        return iterator(root);
     }
 
     const_iterator end() const {
-        return const_iterator(&root);
+        return const_iterator(root);
     }
 
     const_iterator cend() const {
-        return const_iterator(&root);
+        return const_iterator(root);
     }
 
     reference front() {
@@ -470,10 +474,10 @@ public:
         iterator res;
 
         // descent the search tree
-        node *parent = &root;
+        node *parent = root;
         while (true) {
             ++parent->n;
-            if (parent == &root || t < parent->data) {
+            if (parent == root || t < parent->data) {
                 if (parent->left_child) {
                     parent = parent->left_child;
                 } else {
@@ -500,7 +504,7 @@ public:
             if (parent->depth > branch_depth)
                 break;
             parent->depth = 1 + branch_depth;
-            if (parent == &root)
+            if (parent == root)
                 break;
             if (parent->imbalance() < -1) {
                 // check for double-rotation case
@@ -530,7 +534,7 @@ public:
         }
 
         size_type j = i;
-        node *ptr = root.left_child;
+        node *ptr = root->left_child;
         while (true) {
             if (ptr->left_child) {
                 if (j == ptr->left_child->n) {
@@ -560,7 +564,7 @@ public:
         }
 
         size_type j = i;
-        const node *ptr = root.left_child;
+        const node *ptr = root->left_child;
         while (true) {
             if (ptr->left_child) {
                 if (j == ptr->left_child->n) {
@@ -627,7 +631,7 @@ public:
         }
         for (parent = q->parent; parent; parent = parent->parent) {
             parent->update_depth();
-            if (parent == &root)
+            if (parent == root)
                 break;
             if (parent->imbalance() < -1) {
                 // check for double-rotation case
@@ -651,7 +655,7 @@ public:
     }
 
     iterator find(const_reference t) {
-        node *ptr = root.left_child;
+        node *ptr = root->left_child;
         while (ptr) {
             if (t == ptr->data) {
                 return iterator(ptr);
@@ -674,10 +678,10 @@ public:
     }
 
     void clear() {
-        if (root.left_child) {
-            alloc.destroy(root.left_child);
-            alloc.deallocate(root.left_child, 1);
-            root.left_child = 0;
+        if (root->left_child) {
+            alloc.destroy(root->left_child);
+            alloc.deallocate(root->left_child, 1);
+            root->left_child = 0;
         }
     }
 
@@ -689,13 +693,13 @@ public:
     void swap(const avl_tree&);*/
 
     size_type size() {
-        return root.n;
+        return root->n;
     }
 
     size_type max_size();
 
     bool empty() {
-        return root.left_child == 0;
+        return root->left_child == 0;
     }
 
     A get_allocator() {
@@ -755,7 +759,7 @@ private:
 
     using NodeAlloc = typename std::allocator_traits<A>::template rebind_alloc<node>;
     NodeAlloc alloc;
-    node root;
+    node *root;
 
     #ifdef DEBUGMODE
     template <typename U, typename V>
@@ -768,9 +772,9 @@ private:
 #ifdef DEBUGMODE
 template <typename T, typename A = std::allocator<T> >
 std::ostream& operator<<(std::ostream& os, const avl_tree<T,A>& t) {
-    if (!t.root.left_child)
+    if (!t.root->left_child)
         return os << "(empty)" << std::endl;
-    t.root.left_child->print(os, "");
+    t.root->left_child->print(os, "");
     return os;
 }
 #endif
