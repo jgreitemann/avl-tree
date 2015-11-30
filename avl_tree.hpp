@@ -621,15 +621,33 @@ public:
         } else {
             q->parent->right_child = s;
         }
+        node *q_parent = q->parent;
         if (q != ptr) {
-            ptr->data = q->data;
-            itn = iterator(ptr);
+            q->parent = ptr->parent;
+            if (q->parent->left_child == ptr) {
+                q->parent->left_child = q;
+            } else {
+                q->parent->right_child = q;
+            }
+            q->left_child = ptr->left_child;
+            if (q->left_child)
+                q->left_child->parent = q;
+            q->right_child = ptr->right_child;
+            if (q->right_child)
+                q->right_child->parent = q;
+            q->n = ptr->n;
+            q->depth = ptr->depth;
+            ptr->left_child = 0;
+            ptr->right_child = 0;
+        }
+        if (q_parent == ptr) {
+            q_parent = q;
         }
         node *parent;
-        for (parent = q->parent; parent; parent = parent->parent) {
+        for (parent = q_parent; parent; parent = parent->parent) {
             --parent->n;
         }
-        for (parent = q->parent; parent; parent = parent->parent) {
+        for (parent = q_parent; parent; parent = parent->parent) {
             parent->update_depth();
             if (parent == root)
                 break;
@@ -649,8 +667,8 @@ public:
                 break;
             }
         }
-        alloc.destroy(q);
-        alloc.deallocate(q, 1);
+        alloc.destroy(ptr);
+        alloc.deallocate(ptr, 1);
         return itn;
     }
 
