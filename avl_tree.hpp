@@ -11,8 +11,7 @@
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //    GNU General Public License for more details.
 
-#ifndef AVL_TREE_HPP
-#define AVL_TREE_HPP
+#pragma once
 #include <iostream>
 #include <string>
 #include <algorithm>
@@ -795,5 +794,4 @@ std::ostream& operator<<(std::ostream& os, const avl_tree<T,A>& t) {
     t.root->left_child->print(os, "");
     return os;
 }
-#endif
 #endif
