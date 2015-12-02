@@ -17,22 +17,27 @@
 
 using namespace std;
 
-TEST(avl_tree, random_test) {
-    avl_tree<double> t;
-    const unsigned N = 1000000;
+mt19937 rng;
+uniform_real_distribution<double> uniform;
 
-    mt19937 rng;
-    uniform_real_distribution<double> uniform;
-
+void random_double_fill(avl_tree<double> &t, const unsigned N) {
     // fill with random numbers
     size_t i;
     for (i = 0; i < N; i++) {
         t.insert(uniform(rng));
     }
+}
+
+TEST(basic, random_insert_remove) {
+    avl_tree<double> t;
+    const unsigned N = 1000000;
+
+    random_double_fill(t, N);
 
     // check ordering and consistent indices/iterators
     avl_tree<double>::const_iterator it;
     double last = 0.;
+    size_t i;
     for (it = t.begin(), i = 0; it != t.end(); ++it, ++i) {
         ASSERT_EQ(*it, t[i]);
         ASSERT_EQ(true, last <= *it);
@@ -58,6 +63,44 @@ TEST(avl_tree, random_test) {
         t.erase(it2);
     }
     ASSERT_EQ(0, t.size());
+}
+
+TEST(iterators, ordering) {
+    avl_tree<double> t;
+    const unsigned N = 100;
+    random_double_fill(t, N);
+    avl_tree<double>::iterator iit1;
+    avl_tree<double>::const_iterator it2;
+    for (iit1 = t.begin(); iit1 != t.end(); ++iit1) {
+        bool passed = false;
+        avl_tree<double>::const_iterator it1(iit1);
+        for (it2 = --t.end(); it2 != t.begin(); it2--) {
+            if (it1 == it2) {
+                ASSERT_EQ(true, *it1 == *it2);
+                ASSERT_EQ(false, it1 != it2);
+                ASSERT_EQ(false, passed);
+                passed = true;
+                ASSERT_EQ(false, it1 < it2);
+                ASSERT_EQ(false, it1 > it2);
+                ASSERT_EQ(true, it1 <= it2);
+                ASSERT_EQ(true, it1 >= it2);
+            } else {
+                ASSERT_EQ(false, *it1 == *it2);
+                ASSERT_EQ(true, it1 != it2);
+                if (passed) {
+                    ASSERT_EQ(false, it1 < it2);
+                    ASSERT_EQ(false, it1 <= it2);
+                    ASSERT_EQ(true,  it1 > it2);
+                    ASSERT_EQ(true,  it1 >= it2);
+                } else {
+                    ASSERT_EQ(true, it1 < it2);
+                    ASSERT_EQ(true, it1 <= it2);
+                    ASSERT_EQ(false,  it1 > it2);
+                    ASSERT_EQ(false,  it1 >= it2);
+                }
+            }
+        }
+    }
 }
 
 int main(int argc, char *argv[]) {
