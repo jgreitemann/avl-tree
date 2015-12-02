@@ -12,13 +12,12 @@
 //    GNU General Public License for more details.
 
 #include "avl_tree.hpp"
-#include <iostream>
 #include <random>
-#include <cassert>
+#include <gtest/gtest.h>
 
 using namespace std;
 
-int main(int argc, char *argv[]) {
+TEST(avl_tree, random_test) {
     avl_tree<double> t;
     const unsigned N = 1000000;
 
@@ -35,8 +34,8 @@ int main(int argc, char *argv[]) {
     avl_tree<double>::const_iterator it;
     double last = 0.;
     for (it = t.begin(), i = 0; it != t.end(); ++it, ++i) {
-        assert(*it == t[i]);
-        assert(last <= *it);
+        ASSERT_EQ(*it, t[i]);
+        ASSERT_EQ(true, last <= *it);
         last = *it;
     }
 
@@ -48,8 +47,8 @@ int main(int argc, char *argv[]) {
         if (i == N/2) {
             last = 0.;
             for (it = t.begin(), i = 0; it != t.end(); it++, ++i) {
-                assert(*it == t[i]);
-                assert(last <= *it);
+                ASSERT_EQ(*it, t[i]);
+                ASSERT_EQ(true, last <= *it);
                 last = *it;
             }
         }
@@ -58,6 +57,10 @@ int main(int argc, char *argv[]) {
         it2 = t.at(d);
         t.erase(it2);
     }
+    ASSERT_EQ(0, t.size());
+}
 
-    return 0;
+int main(int argc, char *argv[]) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
