@@ -711,6 +711,7 @@ public:
             alloc.destroy(root->left_child);
             alloc.deallocate(root->left_child, 1);
             root->left_child = 0;
+            root->n = 0;
         }
     }
 
