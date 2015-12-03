@@ -37,7 +37,7 @@ int main(int argc, char const *argv[]) {
 
 
 ## Installation
-Since the `avl_tree` is thoroughly templated, it lives entirely in the `avl_tree.hpp` header. `make` will build an example program but is not required to install. Use
+Since the `avl_tree` is thoroughly templated, it lives entirely in the `avl_tree.hpp` header. You do not need to build it, before you can install it. Use
 
     $ make install
 
@@ -46,3 +46,10 @@ to copy the header to an include directory. The default install location is `/us
     $ PREFIX=$HOME/.local make install
 
 (Note that the `include` directory is omitted in the prefix.)
+
+### Running tests
+This project uses Google's [libgtest](https://github.com/google/googletest) to run various tests. If you want to contribute to this project, make sure your modifications pass all the tests before submitting a pull request (or ask for help). Make sure gtests headers and the static library are in your compiler's include path and linker's library search path, respectively. Or, you can set the `$GTEST_INCLUDE_DIR` and `$GTEST_LIBS` environment variables.
+
+    $ make test
+
+will compile and run all the tests.
