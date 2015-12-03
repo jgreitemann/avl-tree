@@ -168,6 +168,19 @@ TEST(tree, copy) {
     ASSERT_EQ(true, t != s);
 }
 
+TEST(tree, copy_assign) {
+    avl_tree<double> t;
+    const unsigned N = 10000;
+    random_double_fill(t, N);
+
+    avl_tree<double> s = t;
+    ASSERT_EQ(t, s);
+
+    int r = (int)(s.size() * uniform(rng));
+    s.erase(s.at(r));
+    ASSERT_EQ(true, t != s);
+}
+
 int main(int argc, char *argv[]) {
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
