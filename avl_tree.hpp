@@ -406,11 +406,21 @@ public:
     }
 
     bool operator==(const avl_tree& t) const {
-        return *root == *t.root;
+        const_iterator it1, it2;
+        for (it1 = cbegin(), it2 = t.cbegin(); it1 != cend() && it2 != t.cend();
+                ++it1, ++it2) {
+            if (*it1 != *it2)
+                return false;
+        }
+        if (it1 == cend() && it2 == t.cend()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     bool operator!=(const avl_tree& t) const {
-        return *root != *t.root;
+        return !(*this == t);
     }
 
     iterator begin() {
@@ -715,7 +725,7 @@ public:
 
     size_type max_size();
 
-    bool empty() {
+    bool empty() const {
         return root->left_child == 0;
     }
 
