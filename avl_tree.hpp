@@ -278,8 +278,8 @@ public:
     public:
         typedef typename A::difference_type difference_type;
         typedef typename A::value_type value_type;
-        typedef typename A::reference const_reference;
-        typedef typename A::pointer const_pointer;
+        typedef typename A::const_reference const_reference;
+        typedef typename A::const_pointer const_pointer;
         typedef std::bidirectional_iterator_tag iterator_category;
 
         const_iterator () {
@@ -383,7 +383,7 @@ public:
             return &(ptr->data);
         }
     private:
-        const node *ptr;
+        node const *ptr;
     };
 
     avl_tree() {
