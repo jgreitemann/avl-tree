@@ -13,18 +13,27 @@
 
 #include "avl_test.hpp"
 
-void random_double_fill(avl_tree<double> &t, const unsigned N) {
+TEST(tree, equality) {
+    avl_tree<double> t, s;
+    const unsigned N = 1000;
+    random_double_fill(t, N);
+
+    avl_tree<double>::const_iterator it;
+    for (it = t.cbegin(); it != t.cend(); ++it) {
+        s.insert(*it);
+    }
+
+    ASSERT_EQ(s, t);
+    ASSERT_EQ(t, s);
+    ASSERT_EQ(false, s != t);
+    ASSERT_EQ(false, t != s);
+
     mt19937 rng;
     uniform_real_distribution<double> uniform;
-
-    // fill with random numbers
-    size_t i;
-    for (i = 0; i < N; i++) {
-        t.insert(uniform(rng));
-    }
-}
-
-int main(int argc, char *argv[]) {
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+    int r = (int)(t.size() * uniform(rng));
+    s.erase(s.at(r));
+    ASSERT_EQ(true, s != t);
+    ASSERT_EQ(true, t != s);
+    ASSERT_EQ(false, s == t);
+    ASSERT_EQ(false, t == s);
 }

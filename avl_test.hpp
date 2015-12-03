@@ -11,20 +11,11 @@
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //    GNU General Public License for more details.
 
-#include "avl_test.hpp"
+#pragma once
+#include "avl_tree.hpp"
+#include <random>
+#include <gtest/gtest.h>
 
-void random_double_fill(avl_tree<double> &t, const unsigned N) {
-    mt19937 rng;
-    uniform_real_distribution<double> uniform;
+using namespace std;
 
-    // fill with random numbers
-    size_t i;
-    for (i = 0; i < N; i++) {
-        t.insert(uniform(rng));
-    }
-}
-
-int main(int argc, char *argv[]) {
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
+void random_double_fill(avl_tree<double>&, const unsigned);

@@ -15,17 +15,20 @@ endif
 
 all: avl_test
 
-avl_test.o: avl_test.cpp avl_tree.hpp
+avl_test.o: avl_test.cpp avl_test.hpp avl_tree.hpp
 	$(CXX) -c $(CFLAGS) $(DEFINES) $<
 
-avl_test: avl_test.o
-	$(CXX) -o $@ $< $(LD_FLAGS)
+tests/%.o: tests/%.cpp avl_test.hpp avl_tree.hpp
+	$(CXX) -o $@ -c $(CFLAGS) $(DEFINES) $<
+
+avl_test: avl_test.o $(addsuffix .o, $(basename $(wildcard tests/*.cpp)))
+	$(CXX) -o $@ $^ $(LD_FLAGS)
 
 test: avl_test
 	./avl_test
 
 clean:
-	$(RM) avl_test.o avl_test
+	$(RM) avl_test.o avl_test tests/*.o
 
 install: avl_tree.hpp
 	$(CP) avl_tree.hpp $(addprefix $(PREFIX), /include/)
