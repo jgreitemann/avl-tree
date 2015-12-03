@@ -30,7 +30,7 @@ void random_double_fill(avl_tree<double> &t, const unsigned N) {
 
 TEST(basic, random_insert_remove) {
     avl_tree<double> t;
-    const unsigned N = 1000000;
+    const unsigned N = 10000;
 
     random_double_fill(t, N);
 
