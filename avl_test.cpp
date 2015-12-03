@@ -181,6 +181,23 @@ TEST(tree, copy_assign) {
     ASSERT_EQ(true, t != s);
 }
 
+TEST(tree, clear) {
+    avl_tree<double> t;
+    const unsigned N = 10000;
+
+    random_double_fill(t, N);
+    ASSERT_EQ(false, t.empty());
+    ASSERT_EQ(N, t.size());
+
+    t.clear();
+    ASSERT_EQ(true, t.empty());
+    ASSERT_EQ(0, t.size());
+
+    random_double_fill(t, N);
+    ASSERT_EQ(false, t.empty());
+    ASSERT_EQ(N, t.size());
+}
+
 int main(int argc, char *argv[]) {
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
