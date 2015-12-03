@@ -41,24 +41,26 @@ private:
         node *left_child;
         node *right_child;
 
-        node(avl_tree& tree) : tree(&tree) {
+        node(avl_tree *tree) : tree(tree) {
             depth = 1;
             n = 1;
+            left_child = 0;
+            right_child = 0;
             parent = 0;
-            left_child = 0;
-            right_child = 0;
         }
-        node(avl_tree& tree, const node& nd) : tree(&tree) {
+        node(avl_tree *tree, const node& nd) : tree(tree) {
             left_child = 0;
             right_child = 0;
+            parent = 0;
             *this = nd;
         }
-        node(avl_tree& tree, const T& t) : tree(&tree) {
+        node(avl_tree *tree, const T& t) : tree(tree) {
             data = t;
             depth = 1;
             n = 1;
             left_child = 0;
             right_child = 0;
+            parent = 0;
         }
         ~node() {
             if (left_child) {
@@ -87,7 +89,7 @@ private:
             } else {
                 if (nd.left_child) {
                     left_child = tree->alloc.allocate(1);
-                    tree->alloc.construct(left_child, *tree, *nd.left_child);
+                    tree->alloc.construct(left_child, tree, *nd.left_child);
                     left_child->parent = this;
                 } else {
                     left_child = 0;
@@ -105,7 +107,7 @@ private:
             } else {
                 if (nd.right_child) {
                     right_child = tree->alloc.allocate(1);
-                    tree->alloc.construct(right_child, *tree, *nd.right_child);
+                    tree->alloc.construct(right_child, tree, *nd.right_child);
                     right_child->parent = this;
                 } else {
                     right_child = 0;
@@ -388,7 +390,7 @@ public:
 
     avl_tree() {
         root = alloc.allocate(1);
-        alloc.construct(root, *this);
+        alloc.construct(root, this);
         root->n = 0;
     }
     avl_tree(const avl_tree& t) {
@@ -401,7 +403,7 @@ public:
 
     avl_tree& operator=(const avl_tree& t) {
         root = alloc.allocate(1);
-        alloc.construct(root, *t.root);
+        alloc.construct(root, this, *t.root);
         return *this;
     }
 
@@ -491,7 +493,7 @@ public:
                     parent = parent->left_child;
                 } else {
                     parent->left_child = alloc.allocate(1);
-                    alloc.construct(parent->left_child, *this, t);
+                    alloc.construct(parent->left_child, this, t);
                     parent->left_child->parent = parent;
                     res = iterator(parent->left_child);
                     break;
@@ -501,7 +503,7 @@ public:
                     parent = parent->right_child;
                 } else {
                     parent->right_child = alloc.allocate(1);
-                    alloc.construct(parent->right_child, *this, t);
+                    alloc.construct(parent->right_child, this, t);
                     parent->right_child->parent = parent;
                     res = iterator(parent->right_child);
                     break;
