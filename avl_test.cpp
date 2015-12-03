@@ -103,6 +103,35 @@ TEST(iterators, ordering) {
     }
 }
 
+TEST(iterators, dereference) {
+    avl_tree<double> t;
+    const unsigned N = 1000;
+    random_double_fill(t, N);
+
+    struct wrapper {
+        double data;
+        wrapper() {};
+        wrapper(const double d) : data(d) {};
+        bool operator<(const wrapper &o) const { return data < o.data; }
+        bool operator>(const wrapper &o) const { return data > o.data; }
+        bool operator<=(const wrapper &o) const { return data <= o.data; }
+        bool operator>=(const wrapper &o) const { return data >= o.data; }
+        bool operator==(const wrapper &o) const { return data == o.data; }
+        bool operator!=(const wrapper &o) const { return data != o.data; }
+    };
+
+    avl_tree<wrapper> w;
+    avl_tree<double>::const_iterator it;
+    for (it = t.cbegin(); it != t.cend(); ++it) {
+        w.insert(wrapper(*it));
+    }
+    avl_tree<wrapper>::const_iterator wit;
+    for (it = t.cbegin(), wit = w.cbegin(); it != t.cend(); ++it, ++wit) {
+        ASSERT_EQ(*it, wit->data);
+    }
+    ASSERT_EQ(wit, w.cend());
+}
+
 int main(int argc, char *argv[]) {
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
