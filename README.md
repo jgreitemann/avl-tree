@@ -37,19 +37,20 @@ int main(int argc, char const *argv[]) {
 
 
 ## Installation
-Since the `avl_tree` is thoroughly templated, it lives entirely in the `avl_tree.hpp` header. You do not need to build it, before you can install it. Use
+This project uses CMake. To install, create a `build` directory, call `cmake` and `make install`:
 
+    $ cd avl-tree
+    $ mkdir build
+    $ cmake ..
     $ make install
 
-to copy the header to an include directory. The default install location is `/usr/local/include/`. To install e.g. to `~/.local/include/` instead, use
+The default install location is `/usr/local/include/`. To install e.g. to `~/.local/include/` instead, use
 
-    $ PREFIX=$HOME/.local make install
+    $ cmake -DCMAKE_INSTALL_PREFIX=$HOME/.local ..
 
 (Note that the `include` directory is omitted in the prefix.)
 
 ### Running tests
-This project uses Google's [libgtest](https://github.com/google/googletest) to run various tests. If you want to contribute to this project, make sure your modifications pass all the tests before submitting a pull request (or ask for help). Make sure gtests headers and the static library are in your compiler's include path and linker's library search path, respectively. Or, you can set the `$GTEST_INCLUDE_DIR` and `$GTEST_LIBS` environment variables.
+This project uses Google's [libgtest](https://github.com/google/googletest) to run various tests. If you want to contribute to this project, make sure your modifications pass all the tests before submitting a pull request (or ask for help). CMake will automatically clone the `googletest` repository in its build directory, configure and build it. To build and run the tests pertaining to `avl-tree`, run
 
     $ make test
-
-will compile and run all the tests.
