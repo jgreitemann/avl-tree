@@ -25,5 +25,5 @@ TEST(tree, copy_assign) {
     uniform_real_distribution<double> uniform;
     int r = (int)(s.size() * uniform(rng));
     s.erase(s.at(r));
-    ASSERT_EQ(true, t != s);
+    ASSERT_TRUE(t != s);
 }

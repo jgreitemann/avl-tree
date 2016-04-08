@@ -25,15 +25,15 @@ TEST(tree, equality) {
 
     ASSERT_EQ(s, t);
     ASSERT_EQ(t, s);
-    ASSERT_EQ(false, s != t);
-    ASSERT_EQ(false, t != s);
+    ASSERT_FALSE(s != t);
+    ASSERT_FALSE(t != s);
 
     mt19937 rng;
     uniform_real_distribution<double> uniform;
     int r = (int)(t.size() * uniform(rng));
     s.erase(s.at(r));
-    ASSERT_EQ(true, s != t);
-    ASSERT_EQ(true, t != s);
-    ASSERT_EQ(false, s == t);
-    ASSERT_EQ(false, t == s);
+    ASSERT_TRUE(s != t);
+    ASSERT_TRUE(t != s);
+    ASSERT_FALSE(s == t);
+    ASSERT_FALSE(t == s);
 }

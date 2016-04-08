@@ -24,27 +24,27 @@ TEST(iterators, ordering) {
         avl_tree<double>::const_iterator it1(iit1);
         for (it2 = --t.end(); it2 != t.begin(); it2--) {
             if (it1 == it2) {
-                ASSERT_EQ(true, *it1 == *it2);
-                ASSERT_EQ(false, it1 != it2);
-                ASSERT_EQ(false, passed);
+                ASSERT_TRUE(*it1 == *it2);
+                ASSERT_FALSE(it1 != it2);
+                ASSERT_FALSE(passed);
                 passed = true;
-                ASSERT_EQ(false, it1 < it2);
-                ASSERT_EQ(false, it1 > it2);
-                ASSERT_EQ(true, it1 <= it2);
-                ASSERT_EQ(true, it1 >= it2);
+                ASSERT_FALSE(it1 < it2);
+                ASSERT_FALSE(it1 > it2);
+                ASSERT_TRUE(it1 <= it2);
+                ASSERT_TRUE(it1 >= it2);
             } else {
-                ASSERT_EQ(false, *it1 == *it2);
-                ASSERT_EQ(true, it1 != it2);
+                ASSERT_FALSE(*it1 == *it2);
+                ASSERT_TRUE(it1 != it2);
                 if (passed) {
-                    ASSERT_EQ(false, it1 < it2);
-                    ASSERT_EQ(false, it1 <= it2);
-                    ASSERT_EQ(true,  it1 > it2);
-                    ASSERT_EQ(true,  it1 >= it2);
+                    ASSERT_FALSE(it1 < it2);
+                    ASSERT_FALSE(it1 <= it2);
+                    ASSERT_TRUE(it1 > it2);
+                    ASSERT_TRUE(it1 >= it2);
                 } else {
-                    ASSERT_EQ(true, it1 < it2);
-                    ASSERT_EQ(true, it1 <= it2);
-                    ASSERT_EQ(false,  it1 > it2);
-                    ASSERT_EQ(false,  it1 >= it2);
+                    ASSERT_TRUE(it1 < it2);
+                    ASSERT_TRUE(it1 <= it2);
+                    ASSERT_FALSE(it1 > it2);
+                    ASSERT_FALSE(it1 >= it2);
                 }
             }
         }

@@ -18,14 +18,14 @@ TEST(tree, clear) {
     const unsigned N = 10000;
 
     random_double_fill(t, N);
-    ASSERT_EQ(false, t.empty());
+    ASSERT_FALSE(t.empty());
     ASSERT_EQ(N, t.size());
 
     t.clear();
-    ASSERT_EQ(true, t.empty());
+    ASSERT_TRUE(t.empty());
     ASSERT_EQ(0, t.size());
 
     random_double_fill(t, N);
-    ASSERT_EQ(false, t.empty());
+    ASSERT_FALSE(t.empty());
     ASSERT_EQ(N, t.size());
 }
