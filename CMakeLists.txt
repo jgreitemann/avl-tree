@@ -1,7 +1,11 @@
 cmake_minimum_required (VERSION 2.6)
-project (avl-tree)
+project (avl-tree CXX)
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
+set(INSTALL_CMAKE_DIR CMake)
+configure_file (avl-tree-config.cmake.in avl-tree-config.cmake)
+install (FILES ${PROJECT_BINARY_DIR}/avl-tree-config.cmake
+         DESTINATION ${INSTALL_CMAKE_DIR})
 install (FILES avl_tree.hpp DESTINATION include)
 
 # The following Google Test setup has been derived from
