@@ -722,7 +722,7 @@ public:
 
     void swap(const avl_tree&);*/
 
-    size_type size() {
+    size_type size() const {
         return root->n;
     }
 
