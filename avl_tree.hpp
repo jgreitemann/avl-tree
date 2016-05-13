@@ -327,6 +327,13 @@ public:
         *this = t;
     }
 
+    avl_tree(avl_tree&& t) {
+        root = t.root;
+        t.root = alloc.allocate(1);
+        alloc.construct(t.root);
+        t.root->n = 0;
+    }
+
     ~avl_tree() {
         clear_node(root);
         alloc.destroy(root);

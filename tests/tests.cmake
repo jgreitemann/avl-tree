@@ -7,4 +7,5 @@ set(AVL_TEST_LIST
     ${PROJECT_SOURCE_DIR}/tests/tree.copy.cpp
     ${PROJECT_SOURCE_DIR}/tests/tree.equality.cpp
     ${PROJECT_SOURCE_DIR}/tests/tree.move_assign.cpp
+    ${PROJECT_SOURCE_DIR}/tests/tree.move.cpp
 )
