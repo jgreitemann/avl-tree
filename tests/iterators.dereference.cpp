@@ -1,5 +1,5 @@
 //    avl-tree
-//    Copyright (C) 2015  Jonas Greitemann
+//    Copyright (C) 2015 -- 2016  Jonas Greitemann
 //
 //    This program is free software; you can redistribute it and/or modify
 //    it under the terms of the GNU General Public License as published by
