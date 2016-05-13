@@ -338,6 +338,11 @@ public:
         return *this;
     }
 
+    avl_tree& operator=(avl_tree&& t) {
+        clear();
+        std::swap(root, t.root);
+    }
+
     bool operator==(const avl_tree& t) const {
         const_iterator it1, it2;
         for (it1 = cbegin(), it2 = t.cbegin(); it1 != cend() && it2 != t.cend();
@@ -641,6 +646,7 @@ public:
         clear_node(root);
         root->left_child = 0;
         root->n = 0;
+        root->depth = 1;
     }
 
     /*template<typename iter>
