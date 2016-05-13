@@ -34,98 +34,27 @@ private:
     class node {
     public:
         T data;
-        avl_tree *tree;
         short depth;
         size_type n;
         node *parent;
         node *left_child;
         node *right_child;
 
-        node(avl_tree *tree) : tree(tree) {
+        node() {
             depth = 1;
             n = 1;
             left_child = 0;
             right_child = 0;
             parent = 0;
         }
-        node(avl_tree *tree, const node& nd) : tree(tree) {
-            left_child = 0;
-            right_child = 0;
-            parent = 0;
-            *this = nd;
-        }
-        node(avl_tree *tree, const T& t) : tree(tree) {
+
+        node(const T& t) {
             data = t;
             depth = 1;
             n = 1;
             left_child = 0;
             right_child = 0;
             parent = 0;
-        }
-        ~node() {
-            if (left_child) {
-                tree->alloc.destroy(left_child);
-                tree->alloc.deallocate(left_child, 1);
-            }
-            if (right_child) {
-                tree->alloc.destroy(right_child);
-                tree->alloc.deallocate(right_child, 1);
-            }
-        }
-
-        node& operator=(const node& nd) {
-            data = nd.data;
-            depth = nd.depth;
-            n = nd.n;
-            if (left_child) {
-                if (nd.left_child) {
-                    *left_child = *nd.left_child;
-                    left_child->parent = this;
-                } else {
-                    tree->alloc.destroy(left_child);
-                    tree->alloc.deallocate(left_child, 1);
-                    left_child = 0;
-                }
-            } else {
-                if (nd.left_child) {
-                    left_child = tree->alloc.allocate(1);
-                    tree->alloc.construct(left_child, tree, *nd.left_child);
-                    left_child->parent = this;
-                } else {
-                    left_child = 0;
-                }
-            }
-            if (right_child) {
-                if (nd.right_child) {
-                    *right_child = *nd.right_child;
-                    right_child->parent = this;
-                } else {
-                    tree->alloc.destroy(right_child);
-                    tree->alloc.deallocate(right_child, 1);
-                    right_child = 0;
-                }
-            } else {
-                if (nd.right_child) {
-                    right_child = tree->alloc.allocate(1);
-                    tree->alloc.construct(right_child, tree, *nd.right_child);
-                    right_child->parent = this;
-                } else {
-                    right_child = 0;
-                }
-            }
-            return *this;
-        }
-
-        bool operator==(const node& n) const {
-            return data == n.data && tree == n.tree
-                   && ((left_child == 0 && n.left_child == 0)
-                       || *left_child == *n.left_child)
-                   && ((right_child == 0 && n.right_child == 0)
-                       || *right_child == *n.right_child);
-        }
-
-        bool operator!=(const node& n) const {
-            return !(*this == n);
         }
 
         #ifdef DEBUGMODE
@@ -390,20 +319,22 @@ public:
 
     avl_tree() {
         root = alloc.allocate(1);
-        alloc.construct(root, this);
+        alloc.construct(root);
         root->n = 0;
     }
+
     avl_tree(const avl_tree& t) {
         *this = t;
     }
+
     ~avl_tree() {
+        clear_node(root);
         alloc.destroy(root);
         alloc.deallocate(root, 1);
     }
 
     avl_tree& operator=(const avl_tree& t) {
-        root = alloc.allocate(1);
-        alloc.construct(root, this, *t.root);
+        root = deep_copy_node(t.root);
         return *this;
     }
 
@@ -493,7 +424,7 @@ public:
                     parent = parent->left_child;
                 } else {
                     parent->left_child = alloc.allocate(1);
-                    alloc.construct(parent->left_child, this, t);
+                    alloc.construct(parent->left_child, t);
                     parent->left_child->parent = parent;
                     res = iterator(parent->left_child);
                     break;
@@ -503,7 +434,7 @@ public:
                     parent = parent->right_child;
                 } else {
                     parent->right_child = alloc.allocate(1);
-                    alloc.construct(parent->right_child, this, t);
+                    alloc.construct(parent->right_child, t);
                     parent->right_child->parent = parent;
                     res = iterator(parent->right_child);
                     break;
@@ -707,12 +638,9 @@ public:
     }
 
     void clear() {
-        if (root->left_child) {
-            alloc.destroy(root->left_child);
-            alloc.deallocate(root->left_child, 1);
-            root->left_child = 0;
-            root->n = 0;
-        }
+        clear_node(root);
+        root->left_child = 0;
+        root->n = 0;
     }
 
     /*template<typename iter>
@@ -787,7 +715,37 @@ private:
         } while (n);
     }
 
-    using NodeAlloc = typename std::allocator_traits<A>::template rebind_alloc<node>;
+    node* deep_copy_node(const node *nd) {
+        node *cp_nd = alloc.allocate(1);
+        alloc.construct(cp_nd, nd->data);
+        cp_nd->n = nd->n;
+        cp_nd->depth = nd->depth;
+        if (nd->left_child) {
+            cp_nd->left_child = deep_copy_node(nd->left_child);
+            cp_nd->left_child->parent = cp_nd;
+        }
+        if (nd->right_child) {
+            cp_nd->right_child = deep_copy_node(nd->right_child);
+            cp_nd->right_child->parent = cp_nd;
+        }
+        return cp_nd;
+    }
+
+    void clear_node(node *nd) {
+        if (nd->left_child) {
+            clear_node(nd->left_child);
+            alloc.destroy(nd->left_child);
+            alloc.deallocate(nd->left_child, 1);
+        }
+        if (nd->right_child) {
+            clear_node(nd->right_child);
+            alloc.destroy(nd->right_child);
+            alloc.deallocate(nd->right_child, 1);
+        }
+    }
+
+    using NodeAlloc = typename std::allocator_traits<A>
+                            ::template rebind_alloc<node>;
     NodeAlloc alloc;
     node *root;
 
