@@ -43,18 +43,18 @@ private:
         node() {
             depth = 1;
             n = 1;
-            left_child = 0;
-            right_child = 0;
-            parent = 0;
+            left_child = nullptr;
+            right_child = nullptr;
+            parent = nullptr;
         }
 
         node(const T& t) {
             data = t;
             depth = 1;
             n = 1;
-            left_child = 0;
-            right_child = 0;
-            parent = 0;
+            left_child = nullptr;
+            right_child = nullptr;
+            parent = nullptr;
         }
 
         #ifdef DEBUGMODE
@@ -106,7 +106,7 @@ public:
         typedef std::bidirectional_iterator_tag iterator_category;
 
         iterator() {
-            ptr = 0;
+            ptr = nullptr;
         }
 
         iterator(node* p) {
@@ -214,7 +214,7 @@ public:
         typedef std::bidirectional_iterator_tag iterator_category;
 
         const_iterator () {
-            ptr = 0;
+            ptr = nullptr;
         }
 
         const_iterator(const node* p) {
@@ -562,10 +562,10 @@ public:
         node *s;
         if (q->left_child) {
             s = q->left_child;
-            q->left_child = 0;
+            q->left_child = nullptr;
         } else {
             s = q->right_child;
-            q->right_child = 0;
+            q->right_child = nullptr;
         }
         if (s) {
             s->parent = q->parent;
@@ -591,8 +591,8 @@ public:
                 q->right_child->parent = q;
             q->n = ptr->n;
             q->depth = ptr->depth;
-            ptr->left_child = 0;
-            ptr->right_child = 0;
+            ptr->left_child = nullptr;
+            ptr->right_child = nullptr;
         }
         if (q_parent == ptr) {
             q_parent = q;
@@ -651,7 +651,7 @@ public:
 
     void clear() {
         clear_node(root);
-        root->left_child = 0;
+        root->left_child = nullptr;
         root->n = 0;
         root->depth = 1;
     }
@@ -670,7 +670,7 @@ public:
     size_type max_size();
 
     bool empty() const {
-        return root->left_child == 0;
+        return root->left_child == nullptr;
     }
 
     A get_allocator() {
