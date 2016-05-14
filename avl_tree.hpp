@@ -1,5 +1,5 @@
 //    avl-tree
-//    Copyright (C) 2015  Jonas Greitemann
+//    Copyright (C) 2015 -- 2016  Jonas Greitemann
 //
 //    This program is free software; you can redistribute it and/or modify
 //    it under the terms of the GNU General Public License as published by
@@ -13,6 +13,7 @@
 
 #pragma once
 #include <iostream>
+#include <utility>
 #include <string>
 #include <algorithm>
 #include <memory>
@@ -40,22 +41,29 @@ private:
         node *left_child;
         node *right_child;
 
-        node() {
-            depth = 1;
-            n = 1;
-            left_child = nullptr;
-            right_child = nullptr;
-            parent = nullptr;
-        }
+        node()
+            : depth(1)
+            , n(1)
+            , left_child(nullptr)
+            , right_child(nullptr)
+            , parent(nullptr) {}
 
-        node(const T& t) {
-            data = t;
-            depth = 1;
-            n = 1;
-            left_child = nullptr;
-            right_child = nullptr;
-            parent = nullptr;
-        }
+        node(const T& t)
+            : data(t)
+            , depth(1)
+            , n(1)
+            , left_child(nullptr)
+            , right_child(nullptr)
+            , parent(nullptr) {}
+
+        node(T&& t) noexcept
+            : data(std::move(t))
+            , depth(1)
+            , n(1)
+            , left_child(nullptr)
+            , right_child(nullptr)
+            , parent(nullptr) {}
+
 
         #ifdef DEBUGMODE
         void print(std::ostream& os, std::string prefix) {
@@ -447,6 +455,63 @@ public:
                 } else {
                     parent->right_child = alloc.allocate(1);
                     alloc.construct(parent->right_child, t);
+                    parent->right_child->parent = parent;
+                    res = iterator(parent->right_child);
+                    break;
+                }
+            }
+        }
+        short branch_depth = 1;
+        do {
+            if (parent->depth > branch_depth)
+                break;
+            parent->depth = 1 + branch_depth;
+            if (parent == root)
+                break;
+            if (parent->imbalance() < -1) {
+                // check for double-rotation case
+                if (parent->left_child->imbalance() > 0) {
+                    rotate_left(parent->left_child);
+                }
+                rotate_right(parent);
+                break;
+            } else if (parent->imbalance() > 1) {
+                // check for double-rotation case
+                if (parent->right_child->imbalance() < 0) {
+                    rotate_right(parent->right_child);
+                }
+                rotate_left(parent);
+                break;
+            }
+            branch_depth = parent->depth;
+            parent = parent->parent;
+        } while(parent);
+        return res;
+    }
+
+    iterator insert(T&& t) {
+        iterator res;
+
+        // descent the search tree
+        node *parent = root;
+        while (true) {
+            ++parent->n;
+            if (parent == root || t < parent->data) {
+                if (parent->left_child) {
+                    parent = parent->left_child;
+                } else {
+                    parent->left_child = alloc.allocate(1);
+                    alloc.construct(parent->left_child, std::move(t));
+                    parent->left_child->parent = parent;
+                    res = iterator(parent->left_child);
+                    break;
+                }
+            } else {
+                if (parent->right_child) {
+                    parent = parent->right_child;
+                } else {
+                    parent->right_child = alloc.allocate(1);
+                    alloc.construct(parent->right_child, std::move(t));
                     parent->right_child->parent = parent;
                     res = iterator(parent->right_child);
                     break;
