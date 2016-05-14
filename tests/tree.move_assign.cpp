@@ -12,6 +12,7 @@
 //    GNU General Public License for more details.
 
 #include "../avl_test.hpp"
+#include <utility>
 
 TEST(tree, move_assign) {
     avl_tree<double> t;
