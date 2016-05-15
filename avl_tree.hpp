@@ -41,14 +41,14 @@ private:
         node *left_child;
         node *right_child;
 
-        node()
+        node() noexcept
             : depth(1)
             , n(1)
             , left_child(nullptr)
             , right_child(nullptr)
             , parent(nullptr) {}
 
-        node(const T& t)
+        node(const T& t) noexcept
             : data(t)
             , depth(1)
             , n(1)
@@ -325,35 +325,35 @@ public:
         node const *ptr;
     };
 
-    avl_tree() {
+    avl_tree() noexcept {
         root = alloc.allocate(1);
         alloc.construct(root);
         root->n = 0;
     }
 
-    avl_tree(const avl_tree& t) {
+    avl_tree(const avl_tree& t) noexcept {
         *this = t;
     }
 
-    avl_tree(avl_tree&& t) {
+    avl_tree(avl_tree&& t) noexcept {
         root = t.root;
         t.root = alloc.allocate(1);
         alloc.construct(t.root);
         t.root->n = 0;
     }
 
-    ~avl_tree() {
+    ~avl_tree() noexcept {
         clear_node(root);
         alloc.destroy(root);
         alloc.deallocate(root, 1);
     }
 
-    avl_tree& operator=(const avl_tree& t) {
+    avl_tree& operator=(const avl_tree& t) noexcept {
         root = deep_copy_node(t.root);
         return *this;
     }
 
-    avl_tree& operator=(avl_tree&& t) {
+    avl_tree& operator=(avl_tree&& t) noexcept {
         clear();
         std::swap(root, t.root);
     }
@@ -714,7 +714,7 @@ public:
         } while(*it == t);
     }
 
-    void clear() {
+    void clear() noexcept {
         clear_node(root);
         root->left_child = nullptr;
         root->n = 0;
@@ -809,7 +809,7 @@ private:
         return cp_nd;
     }
 
-    void clear_node(node *nd) {
+    void clear_node(node *nd) noexcept {
         if (nd->left_child) {
             clear_node(nd->left_child);
             alloc.destroy(nd->left_child);
