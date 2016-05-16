@@ -20,9 +20,21 @@
 #include <iterator>
 #include <exception>
 #include <stdexcept>
+#include <type_traits>
+#include "avl_traits.hpp"
 
 template <typename T, typename A = std::allocator<T> >
 class avl_tree {
+    static_assert(std::is_default_constructible<T>::value,
+                  "AVL tree data needs to be default-constructible");
+    static_assert(std::is_copy_constructible<T>::value,
+                  "AVL tree data needs to be copy-constructible");
+    static_assert(std::is_destructible<T>::value,
+                  "AVL tree data needs to be copy-constructible");
+    static_assert(defines_ordering<T>::value,
+                  "AVL tree data needs to define an ordering via operator<");
+    static_assert(is_comparable<T>::value,
+                  "AVL tree data needs to be comparable via operator==");
     public:
         typedef A allocator_type;
         typedef typename A::value_type value_type;

@@ -6,7 +6,7 @@ set(INSTALL_CMAKE_DIR CMake)
 configure_file (avl-tree-config.cmake.in avl-tree-config.cmake)
 install (FILES ${PROJECT_BINARY_DIR}/avl-tree-config.cmake
          DESTINATION ${INSTALL_CMAKE_DIR})
-install (FILES avl_tree.hpp DESTINATION include)
+install (FILES avl_tree.hpp avl_traits.hpp DESTINATION include)
 
 # The following Google Test setup has been derived from
 # http://stackoverflow.com/questions/9689183/cmake-googletest
