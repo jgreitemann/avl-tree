@@ -737,12 +737,9 @@ class tree {
             root->depth = 1;
         }
 
-        /*template<typename iter>
-        void assign(iter, iter);
-        void assign(std::initializer_list<T>);
-        void assign(size_type, const T&);
-
-        void swap(const tree&);*/
+        void swap(tree& t) {
+            std::swap(root, t.root);
+        }
 
         size_type size() const {
             return root->n;
@@ -848,8 +845,11 @@ class tree {
         friend std::ostream& operator<< (std::ostream&, const tree<U,V>&);
         #endif
 };
-//template <typename T, typename A = std::allocator<T> >
-//void swap(X<T,A>&, X<T,A>&);
+
+template <typename T, typename A = std::allocator<T> >
+void swap(tree<T,A>& t1, tree<T,A>& t2) {
+    t1.swap(t2);
+}
 
 #ifdef DEBUGMODE
 template <typename T, typename A = std::allocator<T> >

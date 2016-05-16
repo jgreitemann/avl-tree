@@ -8,6 +8,7 @@ set(AVL_TEST_LIST
     ${PROJECT_SOURCE_DIR}/tests/tree.equality.cpp
     ${PROJECT_SOURCE_DIR}/tests/tree.move_assign.cpp
     ${PROJECT_SOURCE_DIR}/tests/tree.move.cpp
+    ${PROJECT_SOURCE_DIR}/tests/tree.swap.cpp
     ${PROJECT_SOURCE_DIR}/tests/traits.ordering.cpp
     ${PROJECT_SOURCE_DIR}/tests/traits.comparable.cpp
 )
