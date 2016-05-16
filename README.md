@@ -3,7 +3,9 @@ A templated [AVL tree](https://en.wikipedia.org/wiki/AVL_tree) with STL-style it
 
 ## Usage
 
-The template parameter needs to be of a type supporting comparison operators `<`, `>`, `<=`, `>=`, `==`, and `!=`. While it is possible to obtain mutable references to elements in the tree via the `operator[]` and `find` member functions or by dereferencing mutable iterators, *it is crucial that any mutation of the tree's contents does not interfere with their relative ordering*.
+The template parameter needs to be of a type that is default constructible as well as copy constructible and implements an ordering via `operator<` as well as the equality `operator==`. While it is possible to obtain mutable references to elements in the tree via the `operator[]` and `find` member functions or by dereferencing mutable iterators, *it is crucial that any mutation of the tree's contents does not interfere with their relative ordering*.
+
+When storing compound data types in the tree, you may take advantage of move semantics by abiding to the *rule of five*. `insert` is overloaded to store rvalues.
 
 The example below illustrates the basic use of the tree. A more complete documentation will hopefully be provided in the future. 
 
