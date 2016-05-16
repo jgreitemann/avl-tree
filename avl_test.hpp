@@ -18,4 +18,4 @@
 
 using namespace std;
 
-void random_double_fill(avl_tree<double>&, const unsigned);
+void random_double_fill(AVL::tree<double>&, const unsigned);

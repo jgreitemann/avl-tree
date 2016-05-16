@@ -14,20 +14,22 @@
 #pragma once
 #include <type_traits>
 
-template <typename...> using void_t = void;
+namespace AVL {
+    template <typename...> using void_t = void;
 
 
-template <typename T, typename = void>
-struct defines_ordering : std::false_type {};
+    template <typename T, typename = void>
+    struct defines_ordering : std::false_type {};
 
-template <typename T>
-struct defines_ordering<T, void_t<decltype(T() < T())>>
-        : std::true_type {};
+    template <typename T>
+    struct defines_ordering<T, void_t<decltype(T() < T())>>
+            : std::true_type {};
 
 
-template <typename T, typename = void>
-struct is_comparable : std::false_type {};
+    template <typename T, typename = void>
+    struct is_comparable : std::false_type {};
 
-template <typename T>
-struct is_comparable<T, void_t<decltype(T() == T())>>
-        : std::true_type {};
+    template <typename T>
+    struct is_comparable<T, void_t<decltype(T() == T())>>
+            : std::true_type {};
+}

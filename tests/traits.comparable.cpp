@@ -56,8 +56,8 @@ class dumb_data_t {};
 
 
 TEST(traits, comparable) {
-    ASSERT_TRUE(is_comparable<data_t>::value);
-    ASSERT_TRUE(is_comparable<double>::value);
-    ASSERT_FALSE(is_comparable<dumb_data_t>::value);
-    ASSERT_TRUE(is_comparable<std::complex<double>>::value);
+    ASSERT_TRUE(AVL::is_comparable<data_t>::value);
+    ASSERT_TRUE(AVL::is_comparable<double>::value);
+    ASSERT_FALSE(AVL::is_comparable<dumb_data_t>::value);
+    ASSERT_TRUE(AVL::is_comparable<std::complex<double>>::value);
 }

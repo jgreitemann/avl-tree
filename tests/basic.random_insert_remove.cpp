@@ -14,13 +14,13 @@
 #include "../avl_test.hpp"
 
 TEST(basic, random_insert_remove) {
-    avl_tree<double> t;
+    AVL::tree<double> t;
     const unsigned N = 10000;
 
     random_double_fill(t, N);
 
     // check ordering and consistent indices/iterators
-    avl_tree<double>::const_iterator it;
+    AVL::tree<double>::const_iterator it;
     double last = 0.;
     size_t i;
     for (it = t.begin(), i = 0; it != t.end(); ++it, ++i) {
@@ -32,7 +32,7 @@ TEST(basic, random_insert_remove) {
     // randomly pick elements and delete
     mt19937 rng;
     uniform_real_distribution<double> uniform;
-    avl_tree<double>::iterator it2;
+    AVL::tree<double>::iterator it2;
     size_t d;
     for (size_t i = 0; i < N; i++) {
         // check again half-way in

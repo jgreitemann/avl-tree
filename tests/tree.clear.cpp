@@ -14,7 +14,7 @@
 #include "../avl_test.hpp"
 
 TEST(tree, clear) {
-    avl_tree<double> t;
+    AVL::tree<double> t;
     const unsigned N = 10000;
 
     random_double_fill(t, N);

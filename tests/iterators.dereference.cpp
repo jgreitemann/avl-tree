@@ -14,7 +14,7 @@
 #include "../avl_test.hpp"
 
 TEST(iterators, dereference) {
-    avl_tree<double> t;
+    AVL::tree<double> t;
     const unsigned N = 1000;
     random_double_fill(t, N);
 
@@ -30,12 +30,12 @@ TEST(iterators, dereference) {
         bool operator!=(const wrapper &o) const { return data != o.data; }
     };
 
-    avl_tree<wrapper> w;
-    avl_tree<double>::const_iterator it;
+    AVL::tree<wrapper> w;
+    AVL::tree<double>::const_iterator it;
     for (it = t.cbegin(); it != t.cend(); ++it) {
         w.insert(wrapper(*it));
     }
-    avl_tree<wrapper>::const_iterator wit;
+    AVL::tree<wrapper>::const_iterator wit;
     for (it = t.cbegin(), wit = w.cbegin(); it != t.cend(); ++it, ++wit) {
         ASSERT_EQ(*it, wit->data);
     }

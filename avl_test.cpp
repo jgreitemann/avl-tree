@@ -13,7 +13,7 @@
 
 #include "avl_test.hpp"
 
-void random_double_fill(avl_tree<double> &t, const unsigned N) {
+void random_double_fill(AVL::tree<double> &t, const unsigned N) {
     mt19937 rng;
     uniform_real_distribution<double> uniform;
 

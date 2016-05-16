@@ -15,14 +15,14 @@
 #include <utility>
 
 TEST(tree, move) {
-    avl_tree<double> t;
+    AVL::tree<double> t;
     const unsigned N = 10000;
     random_double_fill(t, N);
 
     // copy first
-    avl_tree<double> t2(t);
+    AVL::tree<double> t2(t);
 
-    avl_tree<double> s(std::move(t2));
+    AVL::tree<double> s(std::move(t2));
     ASSERT_EQ(t, s);
 
     mt19937 rng;

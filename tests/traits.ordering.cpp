@@ -56,8 +56,8 @@ class dumb_data_t {};
 
 
 TEST(traits, ordering) {
-    ASSERT_TRUE(defines_ordering<data_t>::value);
-    ASSERT_TRUE(defines_ordering<double>::value);
-    ASSERT_FALSE(defines_ordering<dumb_data_t>::value);
-    ASSERT_FALSE(defines_ordering<std::complex<double>>::value);
+    ASSERT_TRUE(AVL::defines_ordering<data_t>::value);
+    ASSERT_TRUE(AVL::defines_ordering<double>::value);
+    ASSERT_FALSE(AVL::defines_ordering<dumb_data_t>::value);
+    ASSERT_FALSE(AVL::defines_ordering<std::complex<double>>::value);
 }

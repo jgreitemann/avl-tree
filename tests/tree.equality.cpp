@@ -14,11 +14,11 @@
 #include "../avl_test.hpp"
 
 TEST(tree, equality) {
-    avl_tree<double> t, s;
+    AVL::tree<double> t, s;
     const unsigned N = 1000;
     random_double_fill(t, N);
 
-    avl_tree<double>::const_iterator it;
+    AVL::tree<double>::const_iterator it;
     for (it = t.cbegin(); it != t.cend(); ++it) {
         s.insert(*it);
     }

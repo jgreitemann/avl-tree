@@ -14,11 +14,11 @@
 #include "../avl_test.hpp"
 
 TEST(tree, copy_assign) {
-    avl_tree<double> t;
+    AVL::tree<double> t;
     const unsigned N = 10000;
     random_double_fill(t, N);
 
-    avl_tree<double> s = t;
+    AVL::tree<double> s = t;
     ASSERT_EQ(t, s);
 
     mt19937 rng;

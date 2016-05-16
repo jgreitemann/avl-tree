@@ -23,8 +23,10 @@
 #include <type_traits>
 #include "avl_traits.hpp"
 
+namespace AVL {
+
 template <typename T, typename A = std::allocator<T> >
-class avl_tree {
+class tree {
     static_assert(std::is_default_constructible<T>::value,
                   "AVL tree data needs to be default-constructible");
     static_assert(std::is_copy_constructible<T>::value,
@@ -117,8 +119,8 @@ class avl_tree {
     public:
         class iterator {
                 template <typename U, typename V>
-                friend class avl_tree<U,V>::const_iterator;
-                friend class avl_tree;
+                friend class tree<U,V>::const_iterator;
+                friend class tree;
             public:
                 typedef typename A::difference_type difference_type;
                 typedef typename A::value_type value_type;
@@ -338,40 +340,40 @@ class avl_tree {
                 node const *ptr;
         };
 
-        avl_tree() noexcept {
+        tree() noexcept {
             root = alloc.allocate(1);
             alloc.construct(root);
             root->n = 0;
         }
 
-        avl_tree(const avl_tree& t) noexcept {
+        tree(const tree& t) noexcept {
             *this = t;
         }
 
-        avl_tree(avl_tree&& t) noexcept {
+        tree(tree&& t) noexcept {
             root = t.root;
             t.root = alloc.allocate(1);
             alloc.construct(t.root);
             t.root->n = 0;
         }
 
-        ~avl_tree() noexcept {
+        ~tree() noexcept {
             clear_node(root);
             alloc.destroy(root);
             alloc.deallocate(root, 1);
         }
 
-        avl_tree& operator=(const avl_tree& t) noexcept {
+        tree& operator=(const tree& t) noexcept {
             root = deep_copy_node(t.root);
             return *this;
         }
 
-        avl_tree& operator=(avl_tree&& t) noexcept {
+        tree& operator=(tree&& t) noexcept {
             clear();
             std::swap(root, t.root);
         }
 
-        bool operator==(const avl_tree& t) const {
+        bool operator==(const tree& t) const {
             const_iterator it1, it2;
             for (it1 = cbegin(), it2 = t.cbegin();
                     it1 != cend() && it2 != t.cend();
@@ -386,7 +388,7 @@ class avl_tree {
             }
         }
 
-        bool operator!=(const avl_tree& t) const {
+        bool operator!=(const tree& t) const {
             return !(*this == t);
         }
 
@@ -563,7 +565,7 @@ class avl_tree {
         iterator at(size_type i) {
             // bounds checking
             if (i >= size()) {
-                throw std::out_of_range("avl_tree::at out-of-range");
+                throw std::out_of_range("tree::at out-of-range");
             }
 
             size_type j = i;
@@ -593,7 +595,7 @@ class avl_tree {
         const_iterator at(size_type i) const {
             // bounds checking
             if (i >= size()) {
-                throw std::out_of_range("avl_tree[] out-of-range");
+                throw std::out_of_range("tree[] out-of-range");
             }
 
             size_type j = i;
@@ -740,7 +742,7 @@ class avl_tree {
         void assign(std::initializer_list<T>);
         void assign(size_type, const T&);
 
-        void swap(const avl_tree&);*/
+        void swap(const tree&);*/
 
         size_type size() const {
             return root->n;
@@ -843,7 +845,7 @@ class avl_tree {
 
         #ifdef DEBUGMODE
         template <typename U, typename V>
-        friend std::ostream& operator<< (std::ostream&, const avl_tree<U,V>&);
+        friend std::ostream& operator<< (std::ostream&, const tree<U,V>&);
         #endif
 };
 //template <typename T, typename A = std::allocator<T> >
@@ -851,10 +853,12 @@ class avl_tree {
 
 #ifdef DEBUGMODE
 template <typename T, typename A = std::allocator<T> >
-std::ostream& operator<<(std::ostream& os, const avl_tree<T,A>& t) {
+std::ostream& operator<<(std::ostream& os, const tree<T,A>& t) {
     if (!t.root->left_child)
         return os << "(empty)" << std::endl;
     t.root->left_child->print(os, "");
     return os;
 }
 #endif
+
+}

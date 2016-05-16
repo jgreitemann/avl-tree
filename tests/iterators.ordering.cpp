@@ -14,14 +14,14 @@
 #include "../avl_test.hpp"
 
 TEST(iterators, ordering) {
-    avl_tree<double> t;
+    AVL::tree<double> t;
     const unsigned N = 100;
     random_double_fill(t, N);
-    avl_tree<double>::iterator iit1;
-    avl_tree<double>::const_iterator it2;
+    AVL::tree<double>::iterator iit1;
+    AVL::tree<double>::const_iterator it2;
     for (iit1 = t.begin(); iit1 != t.end(); ++iit1) {
         bool passed = false;
-        avl_tree<double>::const_iterator it1(iit1);
+        AVL::tree<double>::const_iterator it1(iit1);
         for (it2 = --t.end(); it2 != t.begin(); it2--) {
             if (it1 == it2) {
                 ASSERT_TRUE(*it1 == *it2);
