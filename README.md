@@ -14,7 +14,7 @@ The example below illustrates the basic use of the tree. A more complete documen
 #include <avl_tree.hpp>
 
 int main(int argc, char const *argv[]) {
-    avl_tree<int> t;
+    AVL::tree<int> t;
 
     // insert elements to the tree
     t.insert(42);
@@ -22,7 +22,7 @@ int main(int argc, char const *argv[]) {
     t.insert(19);
 
     // iterate in order
-    avl_tree<int>::const_iterator it;
+    AVL::tree<int>::const_iterator it;
     for (it = t.begin(); it != t.end(); ++it)
         std::cout << *it << ", ";
     std::cout << std::endl;
@@ -42,7 +42,7 @@ int main(int argc, char const *argv[]) {
 This project uses CMake. To install, create a `build` directory, call `cmake` and `make install`:
 
     $ cd avl-tree
-    $ mkdir build
+    $ mkdir build && cd build
     $ cmake ..
     $ make install
 
