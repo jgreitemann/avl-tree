@@ -170,7 +170,7 @@ public:
 		do {
 		    before = ptr;
 		    ptr = ptr->parent;
-		} while (before == ptr->right_child);
+		} while (ptr && before == ptr->right_child);
 	    }
 	    return *this;
 	}
@@ -194,7 +194,7 @@ public:
 		do {
 		    before = ptr;
 		    ptr = ptr->parent;
-		} while (before == ptr->left_child);
+		} while (ptr && before == ptr->left_child);
 	    }
 	    return *this;
 	}
@@ -282,7 +282,7 @@ public:
 		do {
 		    before = ptr;
 		    ptr = ptr->parent;
-		} while (before == ptr->right_child);
+		} while (ptr && before == ptr->right_child);
 	    }
 	    return *this;
 	}
@@ -306,7 +306,7 @@ public:
 		do {
 		    before = ptr;
 		    ptr = ptr->parent;
-		} while (before == ptr->left_child);
+		} while (ptr && before == ptr->left_child);
 	    }
 	    return *this;
 	}
