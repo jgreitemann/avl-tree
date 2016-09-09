@@ -40,4 +40,10 @@ TEST(iterators, dereference) {
         ASSERT_EQ(*it, wit->data);
     }
     ASSERT_EQ(wit, w.cend());
+
+    const AVL::tree<wrapper>& wc = w;
+    ASSERT_EQ(w.front(), *w.begin());
+    ASSERT_EQ(w.back(), *(--w.end()));
+    ASSERT_EQ(wc.front(), *wc.begin());
+    ASSERT_EQ(wc.back(), *(--wc.end()));
 }

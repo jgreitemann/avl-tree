@@ -423,7 +423,7 @@ public:
     }
 
     const_reference front() const {
-	iterator b = begin();
+	const_iterator b = begin();
 	return *b;
     }
 
@@ -433,7 +433,7 @@ public:
     }
 
     const_reference back() const {
-	iterator b = end();
+	const_iterator b = end();
 	return *(--b);
     }
 
